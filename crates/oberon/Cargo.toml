@@ -1,7 +1,7 @@
 [package]
-name = "oberon_core"
+name = "oberon"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-libc = "0.2.171"
+oberon_core = { path = "../oberon_core" }
