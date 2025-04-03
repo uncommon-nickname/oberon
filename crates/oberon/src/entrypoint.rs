@@ -1,12 +1,15 @@
 use std::io::{stdout, BufWriter, Result as IoResult, Stdout};
+use std::sync::Arc;
 
 use oberon_core::renderer::Renderer;
 use oberon_core::sys::current_window_size;
 use oberon_core::terminal::term::Terminal;
 
+use crate::app_loop::Loop;
 use crate::application::ApplicationHandler;
 use crate::config::Config;
 use crate::timer::Timer;
+use crate::utils::install_cleanup_handlers;
 
 #[derive(Debug)]
 pub struct Oberon
@@ -15,6 +18,7 @@ pub struct Oberon
     terminal: Terminal,
     timer: Timer,
     config: Config,
+    app_loop: Arc<Loop>,
 }
 
 impl Oberon
@@ -31,12 +35,16 @@ impl Oberon
         let renderer = Renderer::new(buf);
         let terminal = Terminal::new(size);
         let timer = Timer::new(config.fps);
+        let app_loop = Arc::new(Loop::new());
+
+        install_cleanup_handlers(app_loop.clone());
 
         Ok(Self {
             renderer,
             terminal,
             timer,
             config,
+            app_loop,
         })
     }
 
@@ -47,14 +55,24 @@ impl Oberon
             self.renderer.hide_cursor()?;
         }
 
-        loop
+        while self.app_loop.is_running()
         {
             let dt = self.timer.start_frame();
 
-            app.frame(self.terminal.canvas(), dt);
+            app.frame(self.terminal.canvas(), dt, self.app_loop.clone());
             self.terminal.render_frame(&mut self.renderer)?;
 
             self.timer.end_frame();
         }
+        Ok(())
+    }
+}
+
+impl Drop for Oberon
+{
+    fn drop(&mut self)
+    {
+        let _ = self.renderer.clear();
+        let _ = self.renderer.show_cursor();
     }
 }

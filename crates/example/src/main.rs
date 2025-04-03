@@ -1,4 +1,5 @@
 use std::io::Result as IoResult;
+use std::sync::Arc;
 
 use oberon::oberon_core::canvas::Canvas;
 use oberon::oberon_core::color::{Color, Rgb};
@@ -13,7 +14,7 @@ struct App
 
 impl ApplicationHandler for App
 {
-    fn frame(&mut self, mut canvas: Canvas<'_>, _: f32)
+    fn frame(&mut self, mut canvas: Canvas<'_>, _: f32, _: Arc<Loop>)
     {
         canvas.erase();
 
