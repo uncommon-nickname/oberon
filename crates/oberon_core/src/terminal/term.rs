@@ -1,6 +1,7 @@
 use std::io::{Result as IoResult, Write};
 
 use crate::canvas::Canvas;
+use crate::color::Color;
 use crate::linalg::Vec2;
 use crate::renderer::Renderer;
 use crate::terminal::cell::Cell;
@@ -48,8 +49,18 @@ impl Terminal
             let position = cell_index_to_cell_position(index, self.size.x);
 
             renderer.move_cursor(position)?;
-            renderer.change_bg(&cell.bg)?;
-            renderer.change_fg(&cell.fg)?;
+
+            match &cell.bg
+            {
+                Color::Rgb(rgb) => renderer.change_bg(rgb)?,
+                Color::Restore => renderer.reset_bg()?,
+            };
+            match &cell.fg
+            {
+                Color::Rgb(rgb) => renderer.change_fg(rgb)?,
+                Color::Restore => renderer.reset_fg()?,
+            };
+
             renderer.write(cell.char)?;
         }
         renderer.move_cursor(Vec2::ZEROES)?;

@@ -1,11 +1,11 @@
-use crate::color::Rgb;
+use crate::color::Color;
 
 #[derive(Clone, Debug)]
 pub struct Cell
 {
     pub char: char,
-    pub bg: Rgb,
-    pub fg: Rgb,
+    pub bg: Color,
+    pub fg: Color,
 }
 
 impl Cell
@@ -16,8 +16,8 @@ impl Cell
     {
         Self {
             char,
-            bg: Rgb::BLACK,
-            fg: Rgb::BLACK,
+            bg: Color::Restore,
+            fg: Color::Restore,
         }
     }
 }

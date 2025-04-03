@@ -54,6 +54,16 @@ impl<W: Write> Renderer<W>
         write!(self.buffer, "\x1B[{};{}H", pos.y + 1, pos.x + 1)
     }
 
+    pub fn reset_bg(&mut self) -> IoResult<()>
+    {
+        self.buffer.write_all(b"\x1B[49m")
+    }
+
+    pub fn reset_fg(&mut self) -> IoResult<()>
+    {
+        self.buffer.write_all(b"\x1B[39m")
+    }
+
     pub fn show_cursor(&mut self) -> IoResult<()>
     {
         self.buffer.write_all(b"\x1B[?25h")

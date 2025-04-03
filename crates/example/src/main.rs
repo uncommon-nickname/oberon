@@ -1,7 +1,7 @@
 use std::io::Result as IoResult;
 
 use oberon::oberon_core::canvas::Canvas;
-use oberon::oberon_core::color::Rgb;
+use oberon::oberon_core::color::{Color, Rgb};
 use oberon::oberon_core::terminal::cell::Cell;
 use oberon::prelude::*;
 
@@ -18,8 +18,7 @@ impl ApplicationHandler for App
         canvas.erase();
 
         let mut cell = Cell::EMPTY;
-        cell.bg = Rgb::new(1, 1, self.cntr);
-
+        cell.bg = Color::Rgb(Rgb::new(1, 1, self.cntr));
         canvas.fill(cell);
 
         self.cntr = self.cntr.wrapping_add(1);
