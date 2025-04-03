@@ -3,7 +3,7 @@ use std::io::{stdout, BufWriter, Result as IoResult, Stdout};
 use oberon_core::linalg::Vec2;
 use oberon_core::renderer::Renderer;
 use oberon_core::sys::current_window_size;
-use oberon_core::terminal::Terminal;
+use oberon_core::terminal::term::Terminal;
 
 use crate::application::ApplicationHandler;
 

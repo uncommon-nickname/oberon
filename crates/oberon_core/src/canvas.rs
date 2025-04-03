@@ -1,5 +1,6 @@
 use crate::linalg::Vec2;
-use crate::terminal::{Cell, Terminal};
+use crate::terminal::cell::Cell;
+use crate::terminal::term::Terminal;
 
 pub struct Canvas<'a>
 {

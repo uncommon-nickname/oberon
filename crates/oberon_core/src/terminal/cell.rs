@@ -1,5 +1,12 @@
 use crate::color::Rgb;
-use crate::terminal::Cell;
+
+#[derive(Clone, Debug)]
+pub struct Cell
+{
+    pub char: char,
+    pub bg: Rgb,
+    pub fg: Rgb,
+}
 
 impl Cell
 {

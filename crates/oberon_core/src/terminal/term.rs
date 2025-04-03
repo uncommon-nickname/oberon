@@ -3,7 +3,14 @@ use std::io::{Result as IoResult, Write};
 use crate::canvas::Canvas;
 use crate::linalg::Vec2;
 use crate::renderer::Renderer;
-use crate::terminal::{cell_index_to_cell_position, cell_position_to_cell_index, Cell, Terminal};
+use crate::terminal::cell::Cell;
+
+#[derive(Debug)]
+pub struct Terminal
+{
+    size: Vec2,
+    cells: Vec<Cell>,
+}
 
 impl Terminal
 {
@@ -48,4 +55,14 @@ impl Terminal
         renderer.move_cursor(Vec2::ZEROES)?;
         renderer.flush()
     }
+}
+
+pub fn cell_index_to_cell_position(index: usize, width: usize) -> Vec2
+{
+    Vec2::new(index % width, index / width)
+}
+
+fn cell_position_to_cell_index(pos: Vec2, width: usize) -> usize
+{
+    pos.x + pos.y * width
 }

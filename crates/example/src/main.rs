@@ -2,7 +2,7 @@ use std::io::Result as IoResult;
 
 use oberon::oberon_core::canvas::Canvas;
 use oberon::oberon_core::color::Rgb;
-use oberon::oberon_core::terminal::Cell;
+use oberon::oberon_core::terminal::cell::Cell;
 use oberon::prelude::*;
 
 #[derive(Default)]
