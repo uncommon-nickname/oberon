@@ -27,7 +27,7 @@ impl ApplicationHandler for App
 
 fn main() -> IoResult<()>
 {
-    let mut oberon = Oberon::with_automatic_size(60.0)?;
+    let mut oberon = Oberon::new(Config::default())?;
     let app = App::default();
 
     oberon.run_application(app)

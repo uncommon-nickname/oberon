@@ -1,11 +1,11 @@
 use std::io::{stdout, BufWriter, Result as IoResult, Stdout};
 
-use oberon_core::linalg::Vec2;
 use oberon_core::renderer::Renderer;
 use oberon_core::sys::current_window_size;
 use oberon_core::terminal::term::Terminal;
 
 use crate::application::ApplicationHandler;
+use crate::config::Config;
 use crate::timer::Timer;
 
 #[derive(Debug)]
@@ -14,32 +14,39 @@ pub struct Oberon
     renderer: Renderer<BufWriter<Stdout>>,
     terminal: Terminal,
     timer: Timer,
+    config: Config,
 }
 
 impl Oberon
 {
-    pub fn with_size(size: Vec2, fps: f32) -> Self
+    pub fn new(config: Config) -> IoResult<Self>
     {
+        let size = match config.size
+        {
+            Some(size) => size,
+            None => current_window_size()?,
+        };
+
         let buf = BufWriter::new(stdout());
         let renderer = Renderer::new(buf);
         let terminal = Terminal::new(size);
-        let timer = Timer::new(fps);
+        let timer = Timer::new(config.fps);
 
-        Self {
+        Ok(Self {
             renderer,
             terminal,
             timer,
-        }
-    }
-
-    pub fn with_automatic_size(fps: f32) -> IoResult<Self>
-    {
-        let size = current_window_size()?;
-        Ok(Self::with_size(size, fps))
+            config,
+        })
     }
 
     pub fn run_application(&mut self, mut app: impl ApplicationHandler) -> IoResult<()>
     {
+        if self.config.hide_cursor
+        {
+            self.renderer.hide_cursor()?;
+        }
+
         loop
         {
             let dt = self.timer.start_frame();

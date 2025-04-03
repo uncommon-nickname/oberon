@@ -1,5 +1,7 @@
 pub mod application;
+pub mod config;
 pub mod entrypoint;
 pub mod prelude;
-pub use oberon_core;
 pub(crate) mod timer;
+
+pub use oberon_core;
