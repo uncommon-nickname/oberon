@@ -13,7 +13,7 @@ struct App
 
 impl ApplicationHandler for App
 {
-    fn render_frame(&mut self, mut canvas: Canvas<'_>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, _: f32)
     {
         canvas.erase();
 
@@ -27,7 +27,7 @@ impl ApplicationHandler for App
 
 fn main() -> IoResult<()>
 {
-    let mut oberon = Oberon::with_automatic_size()?;
+    let mut oberon = Oberon::with_automatic_size(60.0)?;
     let app = App::default();
 
     oberon.run_application(app)
