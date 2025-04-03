@@ -1,25 +1,35 @@
 use std::io::Result as IoResult;
 
-use oberon::Oberon;
-use oberon_core::color::Rgb;
-use oberon_core::terminal::Cell;
+use oberon::oberon_core::canvas::Canvas;
+use oberon::oberon_core::color::Rgb;
+use oberon::oberon_core::terminal::Cell;
+use oberon::prelude::*;
+
+#[derive(Default)]
+struct App
+{
+    cntr: u8,
+}
+
+impl ApplicationHandler for App
+{
+    fn render_frame(&mut self, mut canvas: Canvas<'_>)
+    {
+        canvas.erase();
+
+        let mut cell = Cell::EMPTY;
+        cell.bg = Rgb::new(1, 1, self.cntr);
+
+        canvas.fill(cell);
+
+        self.cntr = self.cntr.wrapping_add(1);
+    }
+}
 
 fn main() -> IoResult<()>
 {
-    let mut oberon = Oberon::new()?;
-    oberon.hide_cursor()?;
+    let mut oberon = Oberon::with_automatic_size()?;
+    let app = App::default();
 
-    let mut cntr = 0;
-    loop
-    {
-        oberon.frame(|mut canvas| {
-            canvas.erase();
-
-            let mut cell = Cell::EMPTY;
-            cell.bg = Rgb::new(1, 1, cntr);
-
-            canvas.fill(cell);
-        })?;
-        cntr = cntr.wrapping_add(1);
-    }
+    oberon.run_application(app)
 }
