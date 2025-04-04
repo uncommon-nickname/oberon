@@ -1,8 +1,8 @@
 use std::io::{Result as IoResult, Write};
 
-use crate::color::Color;
 use crate::linalg::Vec2;
 use crate::renderer::Renderer;
+use crate::style::color::Color;
 use crate::terminal::cell::Cell;
 
 #[derive(Clone, Debug)]
@@ -35,12 +35,12 @@ impl Block
             match &self.cell.bg
             {
                 Color::Rgb(rgb) => renderer.change_bg(rgb)?,
-                Color::Restore => renderer.reset_bg()?,
+                Color::Default => renderer.reset_bg()?,
             };
             match &self.cell.fg
             {
                 Color::Rgb(rgb) => renderer.change_fg(rgb)?,
-                Color::Restore => renderer.reset_fg()?,
+                Color::Default => renderer.reset_fg()?,
             };
             renderer.write(self.cell.char)?;
             position += Vec2::RIGHT;

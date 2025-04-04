@@ -1,7 +1,7 @@
 use std::io::{Result as IoResult, Write};
 
-use crate::color::Rgb;
 use crate::linalg::Vec2;
+use crate::style::rgb::Rgb;
 
 #[derive(Debug)]
 pub struct Renderer<W: Write>
@@ -21,7 +21,9 @@ impl<W: Write> Renderer<W>
         write!(
             self.buffer,
             "\x1B[48;2;{};{};{}m",
-            color.r, color.g, color.b
+            color.red(),
+            color.green(),
+            color.blue()
         )
     }
 
@@ -30,7 +32,9 @@ impl<W: Write> Renderer<W>
         write!(
             self.buffer,
             "\x1B[38;2;{};{};{}m",
-            color.r, color.g, color.b
+            color.red(),
+            color.green(),
+            color.blue()
         )
     }
 

@@ -4,8 +4,8 @@ use std::sync::Arc;
 
 use oberon::image::codecs::gif::GifDecoder;
 use oberon::image::{AnimationDecoder, Frame};
-use oberon::oberon_core::color::{Color, Rgb};
 use oberon::oberon_core::linalg::Vec2;
+use oberon::oberon_core::style::color::Color;
 use oberon::oberon_core::terminal::cell::Cell;
 use oberon::prelude::*;
 
@@ -40,9 +40,7 @@ impl ApplicationHandler for App
         {
             let [r, g, b, _] = pixel.0;
 
-            let mut cell = Cell::EMPTY;
-            cell.bg = Color::Rgb(Rgb::new(r, g, b));
-
+            let cell = Cell::EMPTY.with_bg(Color::rgb(r, g, b));
             let pos = Vec2::new(x as usize, y as usize);
 
             canvas.draw(pos, cell);

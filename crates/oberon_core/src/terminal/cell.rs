@@ -1,4 +1,4 @@
-use crate::color::Color;
+use crate::style::color::Color;
 
 #[derive(Clone, Debug)]
 pub struct Cell
@@ -16,8 +16,20 @@ impl Cell
     {
         Self {
             char,
-            bg: Color::Restore,
-            fg: Color::Restore,
+            bg: Color::Default,
+            fg: Color::Default,
         }
+    }
+
+    pub const fn with_bg(mut self, bg: Color) -> Self
+    {
+        self.bg = bg;
+        self
+    }
+
+    pub const fn with_fg(mut self, fg: Color) -> Self
+    {
+        self.fg = fg;
+        self
     }
 }
