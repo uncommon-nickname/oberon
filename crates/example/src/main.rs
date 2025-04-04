@@ -1,15 +1,32 @@
-use std::io::Result as IoResult;
+use std::fs::File;
+use std::io::{BufReader, Result as IoResult};
 use std::sync::Arc;
 
+use image::codecs::gif::GifDecoder;
+use image::{AnimationDecoder, Frame};
 use oberon::oberon_core::canvas::Canvas;
 use oberon::oberon_core::color::{Color, Rgb};
+use oberon::oberon_core::linalg::Vec2;
 use oberon::oberon_core::terminal::cell::Cell;
 use oberon::prelude::*;
 
-#[derive(Default)]
 struct App
 {
-    cntr: u8,
+    index: usize,
+    frames: Vec<Frame>,
+}
+
+impl App
+{
+    pub fn new() -> Self
+    {
+        let file = File::open("./smol-miku.gif").unwrap();
+        let buf = BufReader::new(file);
+        let decoder = GifDecoder::new(buf).unwrap();
+        let frames = decoder.into_frames().collect_frames().unwrap();
+
+        Self { index: 0, frames }
+    }
 }
 
 impl ApplicationHandler for App
@@ -18,18 +35,25 @@ impl ApplicationHandler for App
     {
         canvas.erase();
 
-        let mut cell = Cell::EMPTY;
-        cell.bg = Color::Rgb(Rgb::new(1, 1, self.cntr));
-        canvas.fill(cell);
+        let frame = &self.frames[self.index];
 
-        self.cntr = self.cntr.wrapping_add(1);
+        for (x, y, pixel) in frame.buffer().enumerate_pixels()
+        {
+            let [r, g, b, _] = pixel.0;
+
+            let mut cell = Cell::EMPTY;
+            cell.bg = Color::Rgb(Rgb::new(r, g, b));
+
+            canvas.draw(Vec2::new(x as usize, y as usize), cell);
+        }
+        self.index = (self.index + 1) % self.frames.len();
     }
 }
 
 fn main() -> IoResult<()>
 {
-    let mut oberon = Oberon::new(Config::default())?;
-    let app = App::default();
+    let mut oberon = Oberon::new(Config::default().fps(60.0))?;
+    let app = App::new();
 
     oberon.run_application(app)
 }
