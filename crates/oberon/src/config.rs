@@ -1,11 +1,9 @@
-use oberon_core::linalg::Vec2;
-
 #[derive(Debug)]
 pub struct Config
 {
     pub(crate) hide_cursor: bool,
     pub(crate) fps: f32,
-    pub(crate) size: Option<Vec2>,
+    pub(crate) cursor_ratio: usize,
 }
 
 impl Default for Config
@@ -15,7 +13,7 @@ impl Default for Config
         Self {
             hide_cursor: true,
             fps: 60.0,
-            size: None,
+            cursor_ratio: 2,
         }
     }
 }
@@ -34,9 +32,9 @@ impl Config
         self
     }
 
-    pub fn size(mut self, size: Vec2) -> Self
+    pub fn cursor_ratio(mut self, cursor_ratio: usize) -> Self
     {
-        self.size = Some(size);
+        self.cursor_ratio = cursor_ratio;
         self
     }
 }

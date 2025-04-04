@@ -25,15 +25,14 @@ impl Oberon
 {
     pub fn new(config: Config) -> IoResult<Self>
     {
-        let size = match config.size
-        {
-            Some(size) => size,
-            None => current_window_size()?,
-        };
+        let mut size = current_window_size()?;
+        // We have to divide the amount of columns by the cursor ratio
+        // to make sure that we can fit with the block rendering.
+        size.x /= config.cursor_ratio;
 
         let buf = BufWriter::new(stdout());
         let renderer = Renderer::new(buf);
-        let terminal = Terminal::new(size);
+        let terminal = Terminal::new(size, config.cursor_ratio);
         let timer = Timer::new(config.fps);
         let app_loop = Arc::new(Loop::new());
 

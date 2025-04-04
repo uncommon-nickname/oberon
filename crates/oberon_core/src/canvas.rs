@@ -22,7 +22,7 @@ impl<'a> Canvas<'a>
 
     pub fn draw(&mut self, pos: Vec2, cell: Cell)
     {
-        *self.terminal.at(pos) = cell;
+        self.terminal.at(pos).change_cell(cell);
     }
 
     pub fn erase(&mut self)
@@ -32,7 +32,10 @@ impl<'a> Canvas<'a>
 
     pub fn fill(&mut self, cell: Cell)
     {
-        self.terminal.get_cells_mut().fill(cell);
+        for block in self.terminal.get_blocks_mut()
+        {
+            block.change_cell(cell.clone());
+        }
     }
 
     pub fn size(&self) -> Vec2

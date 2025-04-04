@@ -52,7 +52,7 @@ impl ApplicationHandler for App
 
 fn main() -> IoResult<()>
 {
-    let mut oberon = Oberon::new(Config::default().fps(60.0))?;
+    let mut oberon = Oberon::new(Config::default().fps(10.0))?;
     let app = App::new();
 
     oberon.run_application(app)

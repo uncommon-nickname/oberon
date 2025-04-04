@@ -1,30 +1,35 @@
 use std::io::{Result as IoResult, Write};
 
 use crate::canvas::Canvas;
-use crate::color::Color;
 use crate::linalg::Vec2;
 use crate::renderer::Renderer;
+use crate::terminal::block::Block;
 use crate::terminal::cell::Cell;
 
 #[derive(Debug)]
 pub struct Terminal
 {
     size: Vec2,
-    cells: Vec<Cell>,
+    blocks: Vec<Block>,
+    cursor_ratio: usize,
 }
 
 impl Terminal
 {
-    pub fn new(size: Vec2) -> Self
+    pub fn new(size: Vec2, cursor_ratio: usize) -> Self
     {
-        let cells = vec![Cell::EMPTY; size.scalar_product()];
-        Self { size, cells }
+        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); size.scalar_product()];
+        Self {
+            size,
+            blocks,
+            cursor_ratio,
+        }
     }
 
-    pub fn at(&mut self, pos: Vec2) -> &mut Cell
+    pub fn at(&mut self, position: Vec2) -> &mut Block
     {
-        let index = cell_position_to_cell_index(pos, self.size.x);
-        &mut self.cells[index]
+        let index = self.block_position_to_buffer_index(position);
+        &mut self.blocks[index]
     }
 
     pub fn canvas(&mut self) -> Canvas<'_>
@@ -32,48 +37,59 @@ impl Terminal
         Canvas::new(self, self.size)
     }
 
-    pub fn get_cells(&self) -> &Vec<Cell>
+    pub fn get_blocks_mut(&mut self) -> &mut Vec<Block>
     {
-        &self.cells
-    }
-
-    pub fn get_cells_mut(&mut self) -> &mut Vec<Cell>
-    {
-        &mut self.cells
+        &mut self.blocks
     }
 
     pub fn render_frame<W: Write>(&self, renderer: &mut Renderer<W>) -> IoResult<()>
     {
-        for (index, cell) in self.cells.iter().enumerate()
+        for (index, block) in self.blocks.iter().enumerate()
         {
-            let position = cell_index_to_cell_position(index, self.size.x);
-
-            renderer.move_cursor(position)?;
-
-            match &cell.bg
-            {
-                Color::Rgb(rgb) => renderer.change_bg(rgb)?,
-                Color::Restore => renderer.reset_bg()?,
-            };
-            match &cell.fg
-            {
-                Color::Rgb(rgb) => renderer.change_fg(rgb)?,
-                Color::Restore => renderer.reset_fg()?,
-            };
-
-            renderer.write(cell.char)?;
+            let starting_position = self.block_index_to_screen_position(index);
+            block.render_cells(starting_position, renderer)?;
         }
         renderer.move_cursor(Vec2::ZEROES)?;
         renderer.flush()
     }
+
+    fn block_position_to_buffer_index(&self, position: Vec2) -> usize
+    {
+        position.x + position.y * self.size.x
+    }
+
+    fn block_index_to_screen_position(&self, index: usize) -> Vec2
+    {
+        Vec2::new(
+            (index * self.cursor_ratio) % (self.size.x * self.cursor_ratio),
+            index / self.size.x,
+        )
+    }
 }
 
-pub fn cell_index_to_cell_position(index: usize, width: usize) -> Vec2
+#[cfg(test)]
+mod tests
 {
-    Vec2::new(index % width, index / width)
-}
+    use super::*;
 
-fn cell_position_to_cell_index(pos: Vec2, width: usize) -> usize
-{
-    pos.x + pos.y * width
+    #[test]
+    fn test_calculate_screen_position()
+    {
+        let terminal = Terminal::new(Vec2::new(10, 10), 2);
+
+        let pos = terminal.block_index_to_screen_position(0);
+
+        assert_eq!(pos.x, 0);
+        assert_eq!(pos.y, 0);
+
+        let pos = terminal.block_index_to_screen_position(9);
+
+        assert_eq!(pos.x, 18);
+        assert_eq!(pos.y, 0);
+
+        let pos = terminal.block_index_to_screen_position(11);
+
+        assert_eq!(pos.x, 2);
+        assert_eq!(pos.y, 1);
+    }
 }
