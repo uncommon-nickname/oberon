@@ -49,7 +49,7 @@ impl Terminal
             let starting_position = self.block_index_to_screen_position(index);
             block.render_cells(starting_position, renderer)?;
         }
-        renderer.move_cursor(Vec2::ZEROES)?;
+        renderer.move_cursor(Vec2::ZERO)?;
         renderer.flush()
     }
 

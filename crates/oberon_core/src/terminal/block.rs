@@ -25,14 +25,12 @@ impl Block
     }
 
     pub fn render_cells<W: Write>(
-        &self, starting_position: Vec2, renderer: &mut Renderer<W>,
+        &self, mut position: Vec2, renderer: &mut Renderer<W>,
     ) -> IoResult<()>
     {
-        for index in 0..self.cursor_ratio
+        for _ in 0..self.cursor_ratio
         {
-            let new_position = Vec2::new(starting_position.x + index, starting_position.y);
-
-            renderer.move_cursor(new_position)?;
+            renderer.move_cursor(position)?;
 
             match &self.cell.bg
             {
@@ -45,6 +43,7 @@ impl Block
                 Color::Restore => renderer.reset_fg()?,
             };
             renderer.write(self.cell.char)?;
+            position += Vec2::RIGHT;
         }
         Ok(())
     }
