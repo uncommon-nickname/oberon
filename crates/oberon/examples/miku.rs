@@ -2,9 +2,8 @@ use std::fs::File;
 use std::io::{BufReader, Result as IoResult};
 use std::sync::Arc;
 
-use image::codecs::gif::GifDecoder;
-use image::{AnimationDecoder, Frame};
-use oberon::oberon_core::canvas::Canvas;
+use oberon::image::codecs::gif::GifDecoder;
+use oberon::image::{AnimationDecoder, Frame};
 use oberon::oberon_core::color::{Color, Rgb};
 use oberon::oberon_core::linalg::Vec2;
 use oberon::oberon_core::terminal::cell::Cell;
@@ -18,9 +17,9 @@ struct App
 
 impl App
 {
-    pub fn new() -> Self
+    fn new() -> Self
     {
-        let file = File::open("./smol-miku.gif").unwrap();
+        let file = File::open("./assets/smol-miku.gif").unwrap();
         let buf = BufReader::new(file);
         let decoder = GifDecoder::new(buf).unwrap();
         let frames = decoder.into_frames().collect_frames().unwrap();
@@ -44,7 +43,9 @@ impl ApplicationHandler for App
             let mut cell = Cell::EMPTY;
             cell.bg = Color::Rgb(Rgb::new(r, g, b));
 
-            canvas.draw(Vec2::new(x as usize, y as usize), cell);
+            let pos = Vec2::new(x as usize, y as usize);
+
+            canvas.draw(pos, cell);
         }
         self.index = (self.index + 1) % self.frames.len();
     }

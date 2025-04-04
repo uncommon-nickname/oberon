@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 ctrlc = "3.4.5"
+image = "0.25.6"
 oberon_core = { path = "../oberon_core" }
