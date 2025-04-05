@@ -1,7 +1,5 @@
-use crate::linalg::point2::Point2;
-use crate::linalg::vec2::Vec2;
-use crate::terminal::cell::Cell;
-use crate::terminal::term::Terminal;
+use crate::linalg::{Point2, Vec2};
+use crate::terminal::{Cell, Terminal};
 
 pub struct Canvas<'a>
 {

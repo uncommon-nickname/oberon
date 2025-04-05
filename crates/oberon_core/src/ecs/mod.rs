@@ -1,3 +1,7 @@
-pub mod entity;
-pub mod sparse_set;
-pub mod world;
+mod entity;
+pub use entity::EntityBuilder;
+
+mod world;
+pub use world::World;
+
+mod sparse_set;

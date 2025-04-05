@@ -75,17 +75,6 @@ impl<T> SparseSet<T>
         self.sparse[id] = index;
     }
 
-    pub fn contains(&self, id: usize) -> bool
-    {
-        self.sparse[id].is_some()
-    }
-
-    pub fn clear(&mut self)
-    {
-        self.dense.clear();
-        self.sparse.fill(None);
-    }
-
     pub fn get(&self, id: usize) -> Option<&T>
     {
         let index = self.sparse[id]?;
@@ -114,6 +103,13 @@ impl<T> SparseSet<T>
         self.dense.as_mut_slice()
     }
 
+    #[cfg(test)]
+    pub fn contains(&self, id: usize) -> bool
+    {
+        self.sparse[id].is_some()
+    }
+
+    #[cfg(test)]
     pub fn size(&self) -> usize
     {
         self.dense.len()
@@ -177,20 +173,6 @@ mod tests
         set.add(0, 1);
 
         assert_eq!(set.contains(1), false);
-    }
-
-    #[test]
-    fn clear_removes_values_from_dense_and_resets_state()
-    {
-        let mut set = SparseSet::new(10);
-
-        set.add(0, 1);
-        set.add(1, 2);
-        set.clear();
-
-        assert_eq!(set.contains(0), false);
-        assert_eq!(set.contains(1), false);
-        assert_eq!(set.dense.is_empty(), true);
     }
 
     #[test]

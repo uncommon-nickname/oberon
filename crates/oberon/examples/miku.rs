@@ -5,12 +5,10 @@ use std::sync::Arc;
 
 use oberon::image::codecs::gif::GifDecoder;
 use oberon::image::{AnimationDecoder, Frame};
-use oberon::oberon_core::linalg::point2::Point2;
-use oberon::oberon_core::style::color::Color;
-use oberon::oberon_core::style::grayscale::Grayscale;
-use oberon::oberon_core::terminal::cell::Cell;
+use oberon::oberon_core::linalg::Point2;
+use oberon::oberon_core::style::{Color, Grayscale, Rgb};
+use oberon::oberon_core::terminal::Cell;
 use oberon::prelude::*;
-use oberon_core::style::rgb::Rgb;
 
 struct App
 {

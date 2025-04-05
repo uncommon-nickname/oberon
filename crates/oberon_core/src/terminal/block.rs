@@ -1,10 +1,9 @@
 use std::io::{Result as IoResult, Write};
 
-use crate::linalg::point2::Point2;
-use crate::linalg::vec2::Vec2;
+use crate::linalg::{Point2, Vec2};
 use crate::renderer::Renderer;
-use crate::style::color::Color;
-use crate::terminal::cell::Cell;
+use crate::style::Color;
+use crate::terminal::Cell;
 
 #[derive(Clone, Debug)]
 pub struct Block

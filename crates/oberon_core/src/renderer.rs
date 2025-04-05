@@ -1,7 +1,7 @@
 use std::io::{Result as IoResult, Write};
 
-use crate::linalg::point2::Point2;
-use crate::style::rgb::Rgb;
+use crate::linalg::Point2;
+use crate::style::Rgb;
 
 #[derive(Debug)]
 pub struct Renderer<W: Write>

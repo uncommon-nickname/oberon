@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use oberon_core::renderer::Renderer;
 use oberon_core::sys::current_window_size;
-use oberon_core::terminal::term::Terminal;
+use oberon_core::terminal::Terminal;
 
 use crate::app_loop::Loop;
 use crate::application::ApplicationHandler;

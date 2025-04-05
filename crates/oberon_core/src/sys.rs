@@ -2,7 +2,7 @@ use std::io::{Error, Result as IoResult};
 
 use libc::{ioctl, winsize, STDOUT_FILENO, TIOCGWINSZ};
 
-use crate::linalg::vec2::Vec2;
+use crate::linalg::Vec2;
 
 // NOTE: This will only work on unix systems.
 pub fn current_window_size() -> IoResult<Vec2>
