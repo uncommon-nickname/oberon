@@ -6,5 +6,5 @@ use crate::app_loop::Loop;
 
 pub trait ApplicationHandler
 {
-    fn frame(&mut self, canvas: Canvas<'_>, dt: f32, app_loop: Arc<Loop>);
+    fn frame(&mut self, canvas: Canvas<'_>, dt: f32, app_loop: &mut Arc<Loop>);
 }

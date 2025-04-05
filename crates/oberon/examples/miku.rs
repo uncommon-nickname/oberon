@@ -38,7 +38,7 @@ impl App
 
 impl ApplicationHandler for App
 {
-    fn frame(&mut self, mut canvas: Canvas<'_>, _: f32, _: Arc<Loop>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, _: f32, _: &mut Arc<Loop>)
     {
         canvas.erase();
 

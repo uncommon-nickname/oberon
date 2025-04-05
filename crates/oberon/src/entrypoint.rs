@@ -34,7 +34,7 @@ impl Oberon
         let renderer = Renderer::new(buf);
         let terminal = Terminal::new(size, config.cursor_ratio);
         let timer = Timer::new(config.fps);
-        let app_loop = Arc::new(Loop::new());
+        let app_loop = Arc::new(Loop::default());
 
         install_cleanup_handlers(app_loop.clone());
 
@@ -58,7 +58,7 @@ impl Oberon
         {
             let dt = self.timer.start_frame();
 
-            app.frame(self.terminal.canvas(), dt, self.app_loop.clone());
+            app.frame(self.terminal.canvas(), dt, &mut self.app_loop);
             self.terminal.render_frame(&mut self.renderer)?;
 
             self.timer.end_frame();
