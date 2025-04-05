@@ -1,3 +1,4 @@
+use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Result as IoResult};
 use std::sync::Arc;
@@ -6,25 +7,32 @@ use oberon::image::codecs::gif::GifDecoder;
 use oberon::image::{AnimationDecoder, Frame};
 use oberon::oberon_core::linalg::Vec2;
 use oberon::oberon_core::style::color::Color;
+use oberon::oberon_core::style::grayscale::Grayscale;
 use oberon::oberon_core::terminal::cell::Cell;
 use oberon::prelude::*;
+use oberon_core::style::rgb::Rgb;
 
 struct App
 {
     index: usize,
+    use_grayscale: bool,
     frames: Vec<Frame>,
 }
 
 impl App
 {
-    fn new() -> Self
+    fn new(use_grayscale: bool) -> Self
     {
         let file = File::open("./assets/smol-miku.gif").unwrap();
         let buf = BufReader::new(file);
         let decoder = GifDecoder::new(buf).unwrap();
         let frames = decoder.into_frames().collect_frames().unwrap();
 
-        Self { index: 0, frames }
+        Self {
+            index: 0,
+            use_grayscale,
+            frames,
+        }
     }
 }
 
@@ -39,10 +47,19 @@ impl ApplicationHandler for App
         for (x, y, pixel) in frame.buffer().enumerate_pixels()
         {
             let [r, g, b, _] = pixel.0;
+            let rgb = Rgb::new(r, g, b);
 
-            let cell = Cell::EMPTY.with_bg(Color::rgb(r, g, b));
+            let cell = if self.use_grayscale
+            {
+                let gs = Grayscale::from_rgb(rgb.clone());
+                Cell::new(gs.into_char()).with_fg(Color::Rgb(rgb))
+            }
+            else
+            {
+                Cell::EMPTY.with_bg(Color::rgb(r, g, b))
+            };
+
             let pos = Vec2::new(x as usize, y as usize);
-
             canvas.draw(pos, cell);
         }
         self.index = (self.index + 1) % self.frames.len();
@@ -51,8 +68,14 @@ impl ApplicationHandler for App
 
 fn main() -> IoResult<()>
 {
+    let use_grayscale = args()
+        .nth(1)
+        .expect("no value given.")
+        .parse::<bool>()
+        .expect("a valid bool is needed");
+
     let mut oberon = Oberon::new(Config::default().fps(10.0))?;
-    let app = App::new();
+    let app = App::new(use_grayscale);
 
     oberon.run_application(app)
 }
