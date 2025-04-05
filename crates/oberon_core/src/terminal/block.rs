@@ -1,6 +1,7 @@
 use std::io::{Result as IoResult, Write};
 
-use crate::linalg::Vec2;
+use crate::linalg::point2::Point2;
+use crate::linalg::vec2::Vec2;
 use crate::renderer::Renderer;
 use crate::style::color::Color;
 use crate::terminal::cell::Cell;
@@ -25,7 +26,7 @@ impl Block
     }
 
     pub fn render_cells<W: Write>(
-        &self, mut position: Vec2, renderer: &mut Renderer<W>,
+        &self, mut position: Point2, renderer: &mut Renderer<W>,
     ) -> IoResult<()>
     {
         for _ in 0..self.cursor_ratio

@@ -1,4 +1,5 @@
-use crate::linalg::Vec2;
+use crate::linalg::point2::Point2;
+use crate::linalg::vec2::Vec2;
 use crate::terminal::cell::Cell;
 use crate::terminal::term::Terminal;
 
@@ -17,10 +18,10 @@ impl<'a> Canvas<'a>
 
     pub fn area(&self) -> usize
     {
-        self.size.scalar_product()
+        self.size.x * self.size.y
     }
 
-    pub fn draw(&mut self, pos: Vec2, cell: Cell)
+    pub fn draw(&mut self, pos: Point2, cell: Cell)
     {
         self.terminal.at(pos).change_cell(cell);
     }

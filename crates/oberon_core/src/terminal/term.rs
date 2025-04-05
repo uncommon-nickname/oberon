@@ -1,7 +1,8 @@
 use std::io::{Result as IoResult, Write};
 
 use crate::canvas::Canvas;
-use crate::linalg::Vec2;
+use crate::linalg::point2::Point2;
+use crate::linalg::vec2::Vec2;
 use crate::renderer::Renderer;
 use crate::terminal::block::Block;
 use crate::terminal::cell::Cell;
@@ -18,7 +19,7 @@ impl Terminal
 {
     pub fn new(size: Vec2, cursor_ratio: usize) -> Self
     {
-        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); size.scalar_product()];
+        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); size.x * size.y];
         Self {
             size,
             blocks,
@@ -26,7 +27,7 @@ impl Terminal
         }
     }
 
-    pub fn at(&mut self, position: Vec2) -> &mut Block
+    pub fn at(&mut self, position: Point2) -> &mut Block
     {
         let index = self.block_position_to_buffer_index(position);
         &mut self.blocks[index]
@@ -49,18 +50,18 @@ impl Terminal
             let starting_position = self.block_index_to_screen_position(index);
             block.render_cells(starting_position, renderer)?;
         }
-        renderer.move_cursor(Vec2::ZERO)?;
+        renderer.move_cursor(Point2::ZERO)?;
         renderer.flush()
     }
 
-    fn block_position_to_buffer_index(&self, position: Vec2) -> usize
+    fn block_position_to_buffer_index(&self, position: Point2) -> usize
     {
         position.x + position.y * self.size.x
     }
 
-    fn block_index_to_screen_position(&self, index: usize) -> Vec2
+    fn block_index_to_screen_position(&self, index: usize) -> Point2
     {
-        Vec2::new(
+        Point2::new(
             (index * self.cursor_ratio) % (self.size.x * self.cursor_ratio),
             index / self.size.x,
         )

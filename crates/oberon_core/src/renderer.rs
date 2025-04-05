@@ -1,6 +1,6 @@
 use std::io::{Result as IoResult, Write};
 
-use crate::linalg::Vec2;
+use crate::linalg::point2::Point2;
 use crate::style::rgb::Rgb;
 
 #[derive(Debug)]
@@ -53,7 +53,7 @@ impl<W: Write> Renderer<W>
         self.buffer.write_all(b"\x1B[?25l")
     }
 
-    pub fn move_cursor(&mut self, pos: Vec2) -> IoResult<()>
+    pub fn move_cursor(&mut self, pos: Point2) -> IoResult<()>
     {
         write!(self.buffer, "\x1B[{};{}H", pos.y + 1, pos.x + 1)
     }

@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use oberon::image::codecs::gif::GifDecoder;
 use oberon::image::{AnimationDecoder, Frame};
-use oberon::oberon_core::linalg::Vec2;
+use oberon::oberon_core::linalg::point2::Point2;
 use oberon::oberon_core::style::color::Color;
 use oberon::oberon_core::style::grayscale::Grayscale;
 use oberon::oberon_core::terminal::cell::Cell;
@@ -59,7 +59,7 @@ impl ApplicationHandler for App
                 Cell::EMPTY.with_bg(Color::rgb(r, g, b))
             };
 
-            let pos = Vec2::new(x as usize, y as usize);
+            let pos = Point2::new(x as usize, y as usize);
             canvas.draw(pos, cell);
         }
         self.index = (self.index + 1) % self.frames.len();
