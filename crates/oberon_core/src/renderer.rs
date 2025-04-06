@@ -21,9 +21,7 @@ impl<W: Write> Renderer<W>
         write!(
             self.buffer,
             "\x1B[48;2;{};{};{}m",
-            color.red(),
-            color.green(),
-            color.blue()
+            color.r, color.g, color.b
         )
     }
 
@@ -32,9 +30,7 @@ impl<W: Write> Renderer<W>
         write!(
             self.buffer,
             "\x1B[38;2;{};{};{}m",
-            color.red(),
-            color.green(),
-            color.blue()
+            color.r, color.g, color.b
         )
     }
 

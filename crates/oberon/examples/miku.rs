@@ -36,10 +36,13 @@ impl App
 
 impl ApplicationHandler for App
 {
+    fn setup(&mut self, config: &mut Config)
+    {
+        config.fps = 10.0;
+    }
+
     fn frame(&mut self, mut canvas: Canvas<'_>, _: f32, _: &mut Arc<Loop>)
     {
-        canvas.erase();
-
         let frame = &self.frames[self.index];
 
         for (x, y, pixel) in frame.buffer().enumerate_pixels()
@@ -72,8 +75,7 @@ fn main() -> IoResult<()>
         .parse::<bool>()
         .expect("a valid bool is needed");
 
-    let mut oberon = Oberon::new(Config::default().fps(10.0))?;
     let app = App::new(use_grayscale);
 
-    oberon.run_application(app)
+    run_oberon_application(app)
 }

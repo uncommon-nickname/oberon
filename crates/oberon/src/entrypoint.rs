@@ -11,14 +11,35 @@ use crate::config::Config;
 use crate::timer::Timer;
 use crate::utils::install_cleanup_handlers;
 
+pub fn run_oberon_application(mut app: impl ApplicationHandler) -> IoResult<()>
+{
+    let mut config = Config::default();
+
+    app.setup(&mut config);
+
+    let mut oberon = Oberon::new(config)?;
+
+    app.before_start(oberon.terminal.canvas());
+
+    while oberon.app_loop.is_running()
+    {
+        let dt = oberon.timer.start_frame();
+
+        app.frame(oberon.terminal.canvas(), dt, &mut oberon.app_loop);
+        oberon.terminal.render_frame(&mut oberon.renderer)?;
+
+        oberon.timer.end_frame();
+    }
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct Oberon
 {
-    renderer: Renderer<BufWriter<Stdout>>,
-    terminal: Terminal,
-    timer: Timer,
-    config: Config,
-    app_loop: Arc<Loop>,
+    pub(crate) renderer: Renderer<BufWriter<Stdout>>,
+    pub(crate) terminal: Terminal,
+    pub(crate) timer: Timer,
+    pub(crate) app_loop: Arc<Loop>,
 }
 
 impl Oberon
@@ -31,41 +52,24 @@ impl Oberon
         size.x /= config.cursor_ratio;
 
         let buf = BufWriter::new(stdout());
-        let renderer = Renderer::new(buf);
+        let mut renderer = Renderer::new(buf);
         let terminal = Terminal::new(size, config.cursor_ratio);
         let timer = Timer::new(config.fps);
         let app_loop = Arc::new(Loop::default());
 
         install_cleanup_handlers(app_loop.clone());
 
+        if config.hide_cursor
+        {
+            renderer.hide_cursor()?;
+        }
+
         Ok(Self {
             renderer,
             terminal,
             timer,
-            config,
             app_loop,
         })
-    }
-
-    pub fn run_application(&mut self, mut app: impl ApplicationHandler) -> IoResult<()>
-    {
-        if self.config.hide_cursor
-        {
-            self.renderer.hide_cursor()?;
-        }
-
-        app.before_start(self.terminal.canvas());
-
-        while self.app_loop.is_running()
-        {
-            let dt = self.timer.start_frame();
-
-            app.frame(self.terminal.canvas(), dt, &mut self.app_loop);
-            self.terminal.render_frame(&mut self.renderer)?;
-
-            self.timer.end_frame();
-        }
-        Ok(())
     }
 }
 

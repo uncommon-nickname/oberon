@@ -3,9 +3,9 @@ use rand::distr::{Distribution, Uniform};
 #[derive(Copy, Clone, Debug)]
 pub struct Rgb
 {
-    r: u8,
-    g: u8,
-    b: u8,
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 impl Rgb
@@ -33,21 +33,16 @@ impl Rgb
         )
     }
 
-    #[inline]
-    pub const fn red(&self) -> u8
+    pub const fn mix(&self, other: Self, ratio: f32) -> Self
     {
-        self.r
-    }
+        assert!(ratio >= 0.0 && ratio <= 1.0);
 
-    #[inline]
-    pub const fn green(&self) -> u8
-    {
-        self.g
-    }
+        let rest = 1.0 - ratio;
 
-    #[inline]
-    pub const fn blue(&self) -> u8
-    {
-        self.b
+        let r = (rest * self.r as f32 + ratio * other.r as f32) as u8;
+        let g = (rest * self.g as f32 + ratio * other.g as f32) as u8;
+        let b = (rest * self.b as f32 + ratio * other.b as f32) as u8;
+
+        Self::new(r, g, b)
     }
 }

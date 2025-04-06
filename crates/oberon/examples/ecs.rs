@@ -22,9 +22,10 @@ impl Animation
     fn new() -> Self
     {
         let mut rng = rng();
+
         let start_color = Rgb::BLACK;
         let end_color = Rgb::WHITE;
-        let end_time = rng.random_range(2.0..8.0);
+        let end_time = rng.random_range(2.0..10.0);
         let elapsed = 0.0;
 
         Self {
@@ -41,27 +42,15 @@ impl Animation
 
         if time_factor == 1.0
         {
-            self.elapsed = 0.0;
             std::mem::swap(&mut self.start_color, &mut self.end_color);
+            self.elapsed = 0.0;
             return self.interpolate(dt);
         }
 
-        let r = self.new_color(time_factor, self.start_color.red(), self.end_color.red());
-        let b = self.new_color(time_factor, self.start_color.blue(), self.end_color.blue());
-        let g = self.new_color(
-            time_factor,
-            self.start_color.green(),
-            self.end_color.green(),
-        );
-
+        let new_color = self.start_color.mix(self.end_color, time_factor);
         self.elapsed += dt;
 
-        Rgb::new(r as u8, g as u8, b as u8)
-    }
-
-    fn new_color(&self, time_factor: f32, start_value: u8, end_value: u8) -> f32
-    {
-        (1.0 - time_factor) * start_value as f32 + time_factor * end_value as f32
+        new_color
     }
 }
 
@@ -84,21 +73,16 @@ impl ApplicationHandler for App
         {
             for y in 0..size.y
             {
-                let position = Point2::new(x, y);
-                let animation = Animation::new();
-
                 self.world
                     .spawn()
-                    .with::<Point2>(position)
-                    .with::<Animation>(animation);
+                    .with(Point2::new(x, y))
+                    .with(Animation::new());
             }
         }
     }
 
     fn frame(&mut self, mut canvas: Canvas<'_>, dt: f32, _: &mut Arc<Loop>)
     {
-        canvas.erase();
-
         for id in 0..canvas.area()
         {
             let animation = self.world.get_mut::<Animation>(id).unwrap();
@@ -114,11 +98,9 @@ impl ApplicationHandler for App
 
 fn main() -> IoResult<()>
 {
-    let mut oberon = Oberon::new(Config::default())?;
-
     let app = App {
         world: World::new(0),
     };
 
-    oberon.run_application(app)
+    run_oberon_application(app)
 }

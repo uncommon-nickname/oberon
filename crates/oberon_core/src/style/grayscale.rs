@@ -15,9 +15,9 @@ impl Grayscale
 
     pub const fn from_rgb(color: Rgb) -> Self
     {
-        let value = (0.299 * color.red() as f32
-            + 0.587 * color.green() as f32
-            + 0.114 * color.blue() as f32) as u8;
+        let value =
+            (0.299 * color.r as f32 + 0.587 * color.g as f32 + 0.114 * color.b as f32) as u8;
+
         Self { value }
     }
 
