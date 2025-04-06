@@ -50,7 +50,7 @@ impl ApplicationHandler for App
             let cell = if self.use_grayscale
             {
                 let gs = Grayscale::from_rgb(rgb.clone());
-                Cell::new(gs.into_char()).with_fg(Color::Rgb(rgb))
+                Cell::new(gs.into_char())
             }
             else
             {

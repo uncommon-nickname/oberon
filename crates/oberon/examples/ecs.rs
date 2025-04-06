@@ -42,10 +42,7 @@ impl Animation
         if time_factor == 1.0
         {
             self.elapsed = 0.0;
-            let old_start = self.start_color;
-            self.start_color = self.end_color;
-            self.end_color = old_start;
-
+            std::mem::swap(&mut self.start_color, &mut self.end_color);
             return self.interpolate(dt);
         }
 

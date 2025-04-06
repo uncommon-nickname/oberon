@@ -21,15 +21,6 @@ impl Rgb
         Self { r, g, b }
     }
 
-    pub const fn from_float(r: f32, g: f32, b: f32) -> Self
-    {
-        let r = (255.0 * r) as u8;
-        let g = (255.0 * g) as u8;
-        let b = (255.0 * b) as u8;
-
-        Self::new(r, g, b)
-    }
-
     pub fn random() -> Self
     {
         let distr = Uniform::new_inclusive::<u8, u8>(0, 255).unwrap();
