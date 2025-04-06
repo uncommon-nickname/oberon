@@ -14,4 +14,10 @@ impl Color
         let rgb = Rgb::new(r, g, b);
         Color::Rgb(rgb)
     }
+
+    pub fn random() -> Self
+    {
+        let rgb = Rgb::random();
+        Color::Rgb(rgb)
+    }
 }

@@ -1,4 +1,6 @@
-#[derive(Clone, Debug)]
+use rand::distr::{Distribution, Uniform};
+
+#[derive(Copy, Clone, Debug)]
 pub struct Rgb
 {
     r: u8,
@@ -26,6 +28,18 @@ impl Rgb
         let b = (255.0 * b) as u8;
 
         Self::new(r, g, b)
+    }
+
+    pub fn random() -> Self
+    {
+        let distr = Uniform::new_inclusive::<u8, u8>(0, 255).unwrap();
+        let mut rng = rand::rng();
+
+        Self::new(
+            distr.sample(&mut rng),
+            distr.sample(&mut rng),
+            distr.sample(&mut rng),
+        )
     }
 
     #[inline]

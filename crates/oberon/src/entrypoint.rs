@@ -54,6 +54,8 @@ impl Oberon
             self.renderer.hide_cursor()?;
         }
 
+        app.before_start(self.terminal.canvas());
+
         while self.app_loop.is_running()
         {
             let dt = self.timer.start_frame();
