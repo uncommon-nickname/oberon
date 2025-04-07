@@ -11,28 +11,6 @@ use crate::config::Config;
 use crate::timer::Timer;
 use crate::utils::install_cleanup_handlers;
 
-pub fn run_oberon_application(mut app: impl ApplicationHandler) -> IoResult<()>
-{
-    let mut config = Config::default();
-
-    app.setup(&mut config);
-
-    let mut oberon = Oberon::new(config)?;
-
-    app.before_start(oberon.terminal.canvas());
-
-    while oberon.app_loop.is_running()
-    {
-        let dt = oberon.timer.start_frame();
-
-        app.frame(oberon.terminal.canvas(), dt, &mut oberon.app_loop);
-        oberon.terminal.render_frame(&mut oberon.renderer)?;
-
-        oberon.timer.end_frame();
-    }
-    Ok(())
-}
-
 #[derive(Debug)]
 pub struct Oberon
 {
@@ -80,4 +58,26 @@ impl Drop for Oberon
         let _ = self.renderer.clear();
         let _ = self.renderer.show_cursor();
     }
+}
+
+pub fn run_oberon_application(mut app: impl ApplicationHandler) -> IoResult<()>
+{
+    let mut config = Config::default();
+
+    app.setup(&mut config);
+
+    let mut oberon = Oberon::new(config)?;
+
+    app.before_start(oberon.terminal.canvas());
+
+    while oberon.app_loop.is_running()
+    {
+        let dt = oberon.timer.start_frame();
+
+        app.frame(oberon.terminal.canvas(), dt, &mut oberon.app_loop);
+        oberon.terminal.render_frame(&mut oberon.renderer)?;
+
+        oberon.timer.end_frame();
+    }
+    Ok(())
 }

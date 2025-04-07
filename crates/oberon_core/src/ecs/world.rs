@@ -1,8 +1,9 @@
 use std::any::TypeId;
+use std::cell::{Ref, RefMut};
 use std::collections::HashMap;
 
 use crate::ecs::entity::EntityBuilder;
-use crate::ecs::sparse_set::{ComponentStorage, Entry, SparseSet};
+use crate::ecs::sparse_set::{ComponentStorage, SparseSet};
 
 pub struct World
 {
@@ -37,47 +38,62 @@ impl World
             .for_each(|components| components.delete(id))
     }
 
-    pub fn for_each<T: 'static>(&self, mut f: impl FnMut(&T))
+    pub fn get<T: 'static>(&self, id: usize) -> Option<Ref<'_, T>>
+    {
+        self.get_storage::<T>()
+            .and_then(|storage| storage.get(id))
+            .map(|value| value.item.borrow())
+    }
+
+    pub fn get_mut<T: 'static>(&self, id: usize) -> Option<RefMut<'_, T>>
+    {
+        self.get_storage::<T>()
+            .and_then(|storage| storage.get(id))
+            .map(|value| value.item.borrow_mut())
+    }
+
+    pub fn register<T: 'static>(mut self) -> Self
+    {
+        let type_id = TypeId::of::<T>();
+
+        self.components
+            .entry(type_id)
+            .or_insert_with(|| Box::new(SparseSet::<T>::new(self.size)));
+        self
+    }
+}
+
+impl World
+{
+    pub fn for_each_mut<T: 'static>(&self, mut f: impl FnMut(&mut T))
     {
         if let Some(storage) = self.get_storage::<T>()
         {
-            storage.get_all().iter().for_each(|entry| f(&entry.item))
-        }
-    }
-
-    pub fn for_each_mut<T: 'static>(&mut self, mut f: impl FnMut(&mut T))
-    {
-        if let Some(storage) = self.get_storage_mut::<T>()
-        {
             storage
-                .get_all_mut()
-                .iter_mut()
-                .for_each(|entry| f(&mut entry.item));
+                .get_all()
+                .iter()
+                .for_each(|entry| f(&mut entry.item.borrow_mut()))
         }
     }
 
-    pub fn get<T: 'static>(&self, id: usize) -> Option<&T>
+    pub fn for_each_pair_mut<T: 'static, R: 'static>(&self, mut f: impl FnMut(&mut T, &mut R))
     {
-        self.get_storage::<T>().and_then(|storage| storage.get(id))
+        if let (Some(t_storage), Some(r_storage)) =
+            (self.get_storage::<T>(), self.get_storage::<R>())
+        {
+            for entity in t_storage.get_all()
+            {
+                if let Some(other) = r_storage.get(entity.id)
+                {
+                    f(&mut entity.item.borrow_mut(), &mut other.item.borrow_mut())
+                }
+            }
+        }
     }
+}
 
-    pub fn get_all<T: 'static>(&self) -> Option<&[Entry<T>]>
-    {
-        self.get_storage::<T>().map(|storage| storage.get_all())
-    }
-
-    pub fn get_mut<T: 'static>(&mut self, id: usize) -> Option<&mut T>
-    {
-        self.get_storage_mut::<T>()
-            .and_then(|storage| storage.get_mut(id))
-    }
-
-    pub fn get_all_mut<T: 'static>(&mut self) -> Option<&mut [Entry<T>]>
-    {
-        self.get_storage_mut::<T>()
-            .map(|storage| storage.get_all_mut())
-    }
-
+impl World
+{
     pub(crate) fn get_storage<T: 'static>(&self) -> Option<&SparseSet<T>>
     {
         let type_id = TypeId::of::<T>();
@@ -94,16 +110,6 @@ impl World
         self.components
             .get_mut(&type_id)
             .and_then(|components| components.as_any_mut().downcast_mut::<SparseSet<T>>())
-    }
-
-    pub fn register<T: 'static>(mut self) -> Self
-    {
-        let type_id = TypeId::of::<T>();
-
-        self.components
-            .entry(type_id)
-            .or_insert_with(|| Box::new(SparseSet::<T>::new(self.size)));
-        self
     }
 }
 
@@ -131,11 +137,11 @@ mod tests
             .with::<String>("test".to_string())
             .into_id();
 
-        let age = world.get::<u32>(entity_id);
-        let name = world.get::<String>(entity_id);
+        let age = world.get::<u32>(entity_id).unwrap();
+        let name = world.get::<String>(entity_id).unwrap();
 
-        assert_eq!(age, Some(&25));
-        assert_eq!(name, Some(&"test".to_string()));
+        assert_eq!(*age, 25);
+        assert_eq!(*name, "test".to_string());
     }
 
     #[test]
@@ -164,23 +170,9 @@ mod tests
 
         let mut cntr = 0;
 
-        world.for_each::<u32>(|item| cntr += *item);
+        world.for_each_mut::<u32>(|item| cntr += *item);
 
         assert_eq!(cntr, 6);
-    }
-
-    #[test]
-    fn for_each_mut_change_inplace()
-    {
-        let mut world = World::new(10).register::<u32>();
-
-        let first = world.spawn().with::<u32>(1).into_id();
-        let second = world.spawn().with::<u32>(2).into_id();
-
-        world.for_each_mut::<u32>(|item| *item *= 2);
-
-        assert_eq!(world.get::<u32>(first).unwrap(), &2);
-        assert_eq!(world.get::<u32>(second).unwrap(), &4);
     }
 
     #[test]
@@ -209,9 +201,9 @@ mod tests
         let mut world = World::new(10).register::<u32>();
         let entity_id = world.spawn().with::<u32>(25).into_id();
 
-        let value = world.get::<u32>(entity_id);
+        let value = world.get::<u32>(entity_id).unwrap();
 
-        assert_eq!(value, Some(&25));
+        assert_eq!(*value, 25);
     }
 
     #[test]
@@ -228,7 +220,7 @@ mod tests
     #[test]
     fn get_mut_entity_component_when_not_registered()
     {
-        let mut world = World::new(10);
+        let world = World::new(10);
         let value = world.get_mut::<u32>(0);
 
         assert!(value.is_none());
@@ -240,15 +232,16 @@ mod tests
         let mut world = World::new(10).register::<u32>();
         let entity_id = world.spawn().with::<u32>(25).into_id();
 
-        let value = world.get_mut::<u32>(entity_id);
+        let mut value = world.get_mut::<u32>(entity_id).unwrap();
 
-        assert_eq!(value, Some(&mut 25));
+        assert_eq!(*value, 25);
 
-        *value.unwrap() = 36;
+        *value = 36;
+        drop(value);
 
-        let value = world.get::<u32>(entity_id);
+        let value = world.get::<u32>(entity_id).unwrap();
 
-        assert_eq!(value, Some(&36));
+        assert_eq!(*value, 36);
     }
 
     #[test]

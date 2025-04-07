@@ -1,4 +1,5 @@
 use std::any::Any;
+use std::cell::RefCell;
 
 pub trait ComponentStorage
 {
@@ -8,17 +9,26 @@ pub trait ComponentStorage
 }
 
 #[derive(Debug)]
-pub struct Entry<T>
+pub struct Entity<T>
 {
     pub id: usize,
-    pub item: T,
+    pub item: RefCell<T>,
 }
 
 #[derive(Debug)]
 pub struct SparseSet<T>
 {
-    dense: Vec<Entry<T>>,
+    dense: Vec<Entity<T>>,
     sparse: Vec<Option<usize>>,
+}
+
+impl<T> Entity<T>
+{
+    pub fn new(id: usize, item: T) -> Self
+    {
+        let item = RefCell::new(item);
+        Self { id, item }
+    }
 }
 
 impl<T: 'static> ComponentStorage for SparseSet<T>
@@ -63,44 +73,30 @@ impl<T> SparseSet<T>
 
     pub fn add(&mut self, id: usize, item: T)
     {
-        if let Some(stored) = self.get_mut(id)
+        if let Some(stored) = self.get(id)
         {
-            *stored = item;
+            stored.item.replace(item);
             return;
         }
 
         let index = Some(self.dense.len());
 
-        self.dense.push(Entry { id, item });
+        self.dense.push(Entity::new(id, item));
         self.sparse[id] = index;
     }
 
-    pub fn get(&self, id: usize) -> Option<&T>
+    pub fn get(&self, id: usize) -> Option<&Entity<T>>
     {
         let index = self.sparse[id]?;
         let entry = &self.dense[index];
 
-        Some(&entry.item)
+        Some(entry)
     }
 
     #[inline]
-    pub fn get_all(&self) -> &[Entry<T>]
+    pub fn get_all(&self) -> &[Entity<T>]
     {
         self.dense.as_slice()
-    }
-
-    pub fn get_mut(&mut self, id: usize) -> Option<&mut T>
-    {
-        let index = self.sparse[id]?;
-        let entry = &mut self.dense[index];
-
-        Some(&mut entry.item)
-    }
-
-    #[inline]
-    pub fn get_all_mut(&mut self) -> &mut [Entry<T>]
-    {
-        self.dense.as_mut_slice()
     }
 
     #[cfg(test)]
@@ -140,7 +136,7 @@ mod tests
         set.add(5, 1);
 
         assert_eq!(set.sparse[5].unwrap(), 0);
-        assert_eq!(set.dense[0].item, 1);
+        assert_eq!(set.dense[0].item, RefCell::new(1));
     }
 
     #[test]
@@ -152,7 +148,7 @@ mod tests
         set.add(5, 2);
 
         assert_eq!(set.sparse[5].unwrap(), 0);
-        assert_eq!(set.dense[0].item, 2);
+        assert_eq!(set.dense[0].item, RefCell::new(2));
     }
 
     #[test]
@@ -207,28 +203,8 @@ mod tests
         set.delete(4);
 
         assert_eq!(set.contains(4), false);
-        assert_eq!(*set.get(7).unwrap(), 2);
+        assert_eq!(set.get(7).unwrap().item, RefCell::new(2));
         assert_eq!(set.sparse[7].unwrap(), 0);
-    }
-
-    #[test]
-    fn get_mut_returns_null_when_not_present()
-    {
-        let mut set = SparseSet::new(2);
-
-        set.add(0, 1);
-
-        assert_eq!(set.get_mut(1).is_none(), true);
-    }
-
-    #[test]
-    fn get_mut_returns_mutable_ref_when_present()
-    {
-        let mut set = SparseSet::new(1);
-
-        set.add(0, 1);
-
-        assert_eq!(*set.get_mut(0).unwrap(), 1);
     }
 
     #[test]
@@ -248,7 +224,7 @@ mod tests
 
         set.add(0, 1);
 
-        assert_eq!(*set.get(0).unwrap(), 1);
+        assert_eq!(set.get(0).unwrap().item, RefCell::new(1));
     }
 
     #[test]
