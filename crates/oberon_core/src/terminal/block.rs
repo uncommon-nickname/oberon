@@ -35,11 +35,13 @@ impl Block
             match &self.cell.bg
             {
                 Color::Rgb(rgb) => renderer.change_bg(rgb)?,
+                Color::Hsl(hsl) => renderer.change_bg(&hsl.to_rgb())?,
                 Color::Default => renderer.reset_bg()?,
             };
             match &self.cell.fg
             {
                 Color::Rgb(rgb) => renderer.change_fg(rgb)?,
+                Color::Hsl(hsl) => renderer.change_fg(&hsl.to_rgb())?,
                 Color::Default => renderer.reset_fg()?,
             };
             renderer.write(self.cell.char)?;
