@@ -1,6 +1,5 @@
 use rand::distr::{Distribution, Uniform};
 
-use crate::style::utils::{calculate_hue, calculate_saturation};
 use crate::style::Hsl;
 
 #[derive(Copy, Clone, Debug)]
@@ -62,19 +61,31 @@ impl Rgb
         Self::new(r, g, b)
     }
 
+    // https://computergraphics.stackexchange.com/questions/7465/can-someone-explain-this-formula-for-parse-rgb-to-hsl
     pub fn to_hsl(&self) -> Hsl
     {
         let r = self.r as f32 / 255.0;
         let g = self.g as f32 / 255.0;
         let b = self.b as f32 / 255.0;
 
-        let max = r.max(g).max(b);
-        let min = r.min(g).min(b);
+        let cmax = r.max(g).max(b);
+        let cmin = r.min(g).min(b);
+        let delta = cmax - cmin;
 
-        let l = 0.5 * (max + min);
-        let h = calculate_hue(max, min, r, g, b);
-        let s = calculate_saturation(max, min, l);
-
+        let l = (cmax + cmin) / 2.0;
+        let h = match delta
+        {
+            0.0 => 0.0,
+            _ if cmax == r => 60.0 * ((g - b) / delta % 6.0),
+            _ if cmax == g => 60.0 * ((b - r) / delta + 2.0),
+            _ if cmax == b => 60.0 * ((r - g) / delta + 4.0),
+            _ => 0.0,
+        };
+        let s = match delta
+        {
+            0.0 => 0.0,
+            _ => delta / (1.0 - (2.0 * l - 1.0).abs()),
+        };
         Hsl::new(h, s, l)
     }
 }
@@ -87,8 +98,7 @@ mod tests
     #[test]
     fn check_red_hsl_conversion()
     {
-        let rgb = Rgb::new(255, 0, 0);
-        let hsl = rgb.to_hsl();
+        let hsl = Rgb::RED.to_hsl();
 
         assert_eq!(hsl.h, 0.0);
         assert_eq!(hsl.s, 1.0);
@@ -115,5 +125,25 @@ mod tests
         assert_eq!(hsl.h, 240.0);
         assert_eq!(hsl.s, 1.0);
         assert_eq!(hsl.l, 0.2509804);
+    }
+
+    #[test]
+    fn check_white_hsl_conversion()
+    {
+        let hsl = Rgb::WHITE.to_hsl();
+
+        assert_eq!(hsl.h, 0.0);
+        assert_eq!(hsl.s, 0.0);
+        assert_eq!(hsl.l, 1.0);
+    }
+
+    #[test]
+    fn check_black_hsl_conversion()
+    {
+        let hsl = Rgb::BLACK.to_hsl();
+
+        assert_eq!(hsl.h, 0.0);
+        assert_eq!(hsl.s, 0.0);
+        assert_eq!(hsl.l, 0.0);
     }
 }

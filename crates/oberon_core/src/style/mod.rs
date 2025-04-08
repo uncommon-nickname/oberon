@@ -9,5 +9,3 @@ pub use rgb::Rgb;
 
 mod hsl;
 pub use hsl::Hsl;
-
-mod utils;

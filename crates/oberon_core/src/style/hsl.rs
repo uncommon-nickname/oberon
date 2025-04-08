@@ -13,6 +13,12 @@ pub struct Hsl
 
 impl Hsl
 {
+    pub const BLACK: Self = Self::new(0.0, 0.0, 0.0);
+    pub const WHITE: Self = Self::new(0.0, 0.0, 1.0);
+    pub const RED: Self = Self::new(0.0, 1.0, 0.5);
+    pub const GREEN: Self = Self::new(120.0, 1.0, 0.5);
+    pub const BLUE: Self = Self::new(240.0, 1.0, 0.5);
+
     pub const fn new(h: f32, s: f32, l: f32) -> Self
     {
         Self { h, s, l }
