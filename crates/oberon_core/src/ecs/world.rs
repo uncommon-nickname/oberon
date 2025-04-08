@@ -23,14 +23,6 @@ impl World
         }
     }
 
-    pub fn spawn(&mut self) -> EntityBuilder<'_>
-    {
-        let spawned_entity_id = self.current_id;
-        self.current_id += 1;
-
-        EntityBuilder::new(spawned_entity_id, self)
-    }
-
     pub fn despawn(&mut self, id: usize)
     {
         self.components
@@ -61,33 +53,37 @@ impl World
             .or_insert_with(|| Box::new(SparseSet::<T>::new(self.size)));
         self
     }
+
+    pub fn spawn(&mut self) -> EntityBuilder<'_>
+    {
+        let spawned_entity_id = self.current_id;
+        self.current_id += 1;
+
+        EntityBuilder::new(spawned_entity_id, self)
+    }
 }
 
 impl World
 {
-    pub fn for_each_mut<T: 'static>(&self, mut f: impl FnMut(&mut T))
+    pub fn for_each<T: 'static>(&self, mut f: impl FnMut(usize, Ref<'_, T>))
     {
         if let Some(storage) = self.get_storage::<T>()
         {
             storage
                 .get_all()
                 .iter()
-                .for_each(|entry| f(&mut entry.item.borrow_mut()))
+                .for_each(|entity| f(entity.id, entity.item.borrow()))
         }
     }
 
-    pub fn for_each_pair_mut<T: 'static, R: 'static>(&self, mut f: impl FnMut(&mut T, &mut R))
+    pub fn for_each_mut<T: 'static>(&self, mut f: impl FnMut(usize, RefMut<'_, T>))
     {
-        if let (Some(t_storage), Some(r_storage)) =
-            (self.get_storage::<T>(), self.get_storage::<R>())
+        if let Some(storage) = self.get_storage::<T>()
         {
-            for entity in t_storage.get_all()
-            {
-                if let Some(other) = r_storage.get(entity.id)
-                {
-                    f(&mut entity.item.borrow_mut(), &mut other.item.borrow_mut())
-                }
-            }
+            storage
+                .get_all()
+                .iter()
+                .for_each(|entity| f(entity.id, entity.item.borrow_mut()))
         }
     }
 }
@@ -170,7 +166,7 @@ mod tests
 
         let mut cntr = 0;
 
-        world.for_each_mut::<u32>(|item| cntr += *item);
+        world.for_each_mut::<u32>(|_, item| cntr += *item);
 
         assert_eq!(cntr, 6);
     }

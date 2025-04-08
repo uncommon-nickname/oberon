@@ -1,11 +1,28 @@
 use std::any::type_name;
+use std::cell::RefCell;
 
 use crate::ecs::world::World;
+
+#[derive(Debug)]
+pub struct Entity<T>
+{
+    pub id: usize,
+    pub item: RefCell<T>,
+}
 
 pub struct EntityBuilder<'a>
 {
     id: usize,
     world: &'a mut World,
+}
+
+impl<T> Entity<T>
+{
+    pub const fn new(id: usize, item: T) -> Self
+    {
+        let item = RefCell::new(item);
+        Self { id, item }
+    }
 }
 
 impl<'a> EntityBuilder<'a>

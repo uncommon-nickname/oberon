@@ -83,13 +83,14 @@ impl ApplicationHandler for App
 
     fn frame(&mut self, mut canvas: Canvas<'_>, dt: f32, _: &mut Arc<Loop>)
     {
-        self.world
-            .for_each_pair_mut::<Point2, Animation>(|position, animation| {
-                let next = animation.interpolate(dt);
-                let cell = Cell::EMPTY.with_bg(Color::Rgb(next));
+        self.world.for_each::<Point2>(|id, pos| {
+            let mut animation = self.world.get_mut::<Animation>(id).unwrap();
 
-                canvas.draw(*position, cell);
-            });
+            let next_color = animation.interpolate(dt);
+            let cell = Cell::EMPTY.with_bg(Color::Rgb(next_color));
+
+            canvas.draw(*pos, cell);
+        });
     }
 }
 

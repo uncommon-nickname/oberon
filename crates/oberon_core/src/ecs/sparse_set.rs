@@ -1,5 +1,6 @@
 use std::any::Any;
-use std::cell::RefCell;
+
+use crate::ecs::entity::Entity;
 
 pub trait ComponentStorage
 {
@@ -9,26 +10,10 @@ pub trait ComponentStorage
 }
 
 #[derive(Debug)]
-pub struct Entity<T>
-{
-    pub id: usize,
-    pub item: RefCell<T>,
-}
-
-#[derive(Debug)]
 pub struct SparseSet<T>
 {
     dense: Vec<Entity<T>>,
     sparse: Vec<Option<usize>>,
-}
-
-impl<T> Entity<T>
-{
-    pub fn new(id: usize, item: T) -> Self
-    {
-        let item = RefCell::new(item);
-        Self { id, item }
-    }
 }
 
 impl<T: 'static> ComponentStorage for SparseSet<T>
@@ -116,6 +101,8 @@ impl<T> SparseSet<T>
 
 mod tests
 {
+    use std::cell::RefCell;
+
     use super::*;
 
     #[test]
