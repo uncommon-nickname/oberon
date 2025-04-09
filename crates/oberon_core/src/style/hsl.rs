@@ -1,6 +1,6 @@
 use crate::style::Rgb;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Hsl
 {
     /// Hue in deegrees (0.0 - 360.0)

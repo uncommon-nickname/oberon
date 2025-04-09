@@ -42,14 +42,11 @@ impl<'a> Canvas<'a>
 
     pub fn erase(&mut self)
     {
-        self.fill(Cell::EMPTY);
+        self.terminal.fill(Cell::EMPTY);
     }
 
     pub fn fill(&mut self, cell: Cell)
     {
-        for block in self.terminal.get_blocks_mut()
-        {
-            block.change_cell(cell);
-        }
+        self.terminal.fill(cell);
     }
 }

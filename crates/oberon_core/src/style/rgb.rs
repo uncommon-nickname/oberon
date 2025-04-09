@@ -2,7 +2,7 @@ use rand::distr::{Distribution, Uniform};
 
 use crate::style::Hsl;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Rgb
 {
     pub r: u8,

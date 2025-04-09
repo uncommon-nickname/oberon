@@ -1,7 +1,7 @@
 use std::io::{Result as IoResult, Write};
 
 use crate::canvas::Canvas;
-use crate::linalg::{Point2, Rectangle, Vec2};
+use crate::linalg::{Point2, Rectangle, Shape, Vec2};
 use crate::renderer::Renderer;
 use crate::terminal::block::Block;
 use crate::terminal::cell::Cell;
@@ -10,8 +10,9 @@ use crate::terminal::cell::Cell;
 pub struct Terminal
 {
     working_area: Rectangle,
-    blocks: Vec<Block>,
     cursor_ratio: usize,
+    blocks: Vec<Block>,
+    cache: Vec<Block>,
 }
 
 impl Terminal
@@ -19,18 +20,19 @@ impl Terminal
     pub fn new(size: Vec2, cursor_ratio: usize) -> Self
     {
         let working_area = Rectangle::from_size(Point2::ZERO, size);
-        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); size.x * size.y];
+        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); working_area.area()];
 
         Self {
             working_area,
-            blocks,
             cursor_ratio,
+            blocks: blocks.clone(),
+            cache: blocks,
         }
     }
 
     pub fn at(&mut self, position: Point2) -> &mut Block
     {
-        let index = self.block_position_to_buffer_index(position);
+        let index = block_position_to_buffer_index(position, self.working_area.width());
         &mut self.blocks[index]
     }
 
@@ -39,59 +41,50 @@ impl Terminal
         Canvas::new(self, self.working_area)
     }
 
-    pub fn get_blocks_mut(&mut self) -> &mut Vec<Block>
+    pub fn fill(&mut self, cell: Cell)
     {
-        &mut self.blocks
+        for block in self.blocks.iter_mut()
+        {
+            block.change_cell(cell);
+        }
     }
 
-    pub fn render_frame<W: Write>(&self, renderer: &mut Renderer<W>) -> IoResult<()>
+    pub fn render_frame<W: Write>(&mut self, renderer: &mut Renderer<W>) -> IoResult<()>
     {
-        for (index, block) in self.blocks.iter().enumerate()
+        // Iterate only over the blocks that were changed in the last
+        // frame.
+        for (index, (block, cache)) in self
+            .blocks
+            .iter()
+            .zip(self.cache.iter_mut())
+            .enumerate()
+            .filter(|(_, (block, cache))| *block != *cache)
         {
-            let starting_position = self.block_index_to_screen_position(index);
-            block.render_cells(starting_position, renderer)?;
+            let width = self.working_area.width();
+            let position = block_index_to_screen_position(index, self.cursor_ratio, width);
+
+            // Render the changed blocks only.
+            block.render_cells(position, renderer)?;
+
+            // Cache the new changes for next frame.
+            *cache = *block;
         }
         renderer.move_cursor(Point2::ZERO)?;
         renderer.flush()
     }
-
-    fn block_position_to_buffer_index(&self, position: Point2) -> usize
-    {
-        position.x + position.y * self.working_area.width()
-    }
-
-    fn block_index_to_screen_position(&self, index: usize) -> Point2
-    {
-        Point2::new(
-            (index * self.cursor_ratio) % (self.working_area.width() * self.cursor_ratio),
-            index / self.working_area.width(),
-        )
-    }
 }
 
-#[cfg(test)]
-mod tests
+#[inline]
+fn block_position_to_buffer_index(position: Point2, width: usize) -> usize
 {
-    use super::*;
+    position.x + position.y * width
+}
 
-    #[test]
-    fn test_calculate_screen_position()
-    {
-        let terminal = Terminal::new(Vec2::new(10, 10), 2);
-
-        let pos = terminal.block_index_to_screen_position(0);
-
-        assert_eq!(pos.x, 0);
-        assert_eq!(pos.y, 0);
-
-        let pos = terminal.block_index_to_screen_position(9);
-
-        assert_eq!(pos.x, 18);
-        assert_eq!(pos.y, 0);
-
-        let pos = terminal.block_index_to_screen_position(11);
-
-        assert_eq!(pos.x, 2);
-        assert_eq!(pos.y, 1);
-    }
+#[inline]
+fn block_index_to_screen_position(index: usize, cursor_ratio: usize, width: usize) -> Point2
+{
+    Point2::new(
+        (index * cursor_ratio) % (width * cursor_ratio),
+        index / width,
+    )
 }

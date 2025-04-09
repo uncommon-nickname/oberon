@@ -27,7 +27,8 @@ impl Oberon
         let mut size = current_window_size()?;
         // We have to divide the amount of columns by the cursor ratio
         // to make sure that we can fit with the block rendering.
-        size.x /= config.cursor_ratio;
+
+        size.x = (size.x + config.cursor_ratio - 1) / config.cursor_ratio;
 
         let buf = BufWriter::new(stdout());
         let mut renderer = Renderer::new(buf);

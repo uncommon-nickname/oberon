@@ -5,7 +5,7 @@ use crate::renderer::Renderer;
 use crate::style::Color;
 use crate::terminal::Cell;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Block
 {
     cell: Cell,
