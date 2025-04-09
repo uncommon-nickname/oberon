@@ -12,7 +12,6 @@ pub struct Terminal
     working_area: Rectangle,
     cursor_ratio: usize,
     blocks: Vec<Block>,
-    cache: Vec<Block>,
 }
 
 impl Terminal
@@ -25,8 +24,7 @@ impl Terminal
         Self {
             working_area,
             cursor_ratio,
-            blocks: blocks.clone(),
-            cache: blocks,
+            blocks,
         }
     }
 
@@ -36,9 +34,14 @@ impl Terminal
         &mut self.blocks[index]
     }
 
+    pub fn area(&self) -> usize
+    {
+        self.working_area.area()
+    }
+
     pub fn canvas(&mut self) -> Canvas<'_>
     {
-        Canvas::new(self, self.working_area)
+        Canvas::new(self)
     }
 
     pub fn fill(&mut self, cell: Cell)
@@ -51,26 +54,24 @@ impl Terminal
 
     pub fn render_frame<W: Write>(&mut self, renderer: &mut Renderer<W>) -> IoResult<()>
     {
-        // Iterate only over the blocks that were changed in the last
-        // frame.
-        for (index, (block, cache)) in self
+        let width = self.working_area.width();
+
+        for (index, block) in self
             .blocks
-            .iter()
-            .zip(self.cache.iter_mut())
+            .iter_mut()
             .enumerate()
-            .filter(|(_, (block, cache))| *block != *cache)
+            .filter(|(_, block)| block.is_dirty())
         {
-            let width = self.working_area.width();
             let position = block_index_to_screen_position(index, self.cursor_ratio, width);
-
-            // Render the changed blocks only.
             block.render_cells(position, renderer)?;
-
-            // Cache the new changes for next frame.
-            *cache = *block;
         }
         renderer.move_cursor(Point2::ZERO)?;
         renderer.flush()
+    }
+
+    pub fn size(&self) -> Vec2
+    {
+        self.working_area.size()
     }
 }
 

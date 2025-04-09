@@ -10,24 +10,39 @@ pub struct Block
 {
     cell: Cell,
     cursor_ratio: usize,
+    dirty: bool,
 }
 
 impl Block
 {
     pub const fn new(cell: Cell, cursor_ratio: usize) -> Self
     {
-        Self { cell, cursor_ratio }
+        Self {
+            cell,
+            cursor_ratio,
+            dirty: true,
+        }
     }
 
     pub fn change_cell(&mut self, new_cell: Cell)
     {
+        // Changed block becomes dirty, should not be cached.
+        self.dirty = true;
         self.cell = new_cell;
     }
 
+    pub fn is_dirty(&self) -> bool
+    {
+        self.dirty
+    }
+
     pub fn render_cells<W: Write>(
-        &self, mut position: Point2, renderer: &mut Renderer<W>,
+        &mut self, mut position: Point2, renderer: &mut Renderer<W>,
     ) -> IoResult<()>
     {
+        // Rendered block is no longer dirty, can be cached.
+        self.dirty = false;
+
         for _ in 0..self.cursor_ratio
         {
             renderer.move_cursor(position)?;
