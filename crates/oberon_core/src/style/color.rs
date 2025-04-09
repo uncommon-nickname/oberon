@@ -1,6 +1,6 @@
 use crate::style::{Hsl, Rgb};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Color
 {
     Rgb(Rgb),

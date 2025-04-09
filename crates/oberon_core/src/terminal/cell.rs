@@ -1,6 +1,6 @@
 use crate::style::Color;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Cell
 {
     pub char: char,

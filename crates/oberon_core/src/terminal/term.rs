@@ -1,7 +1,7 @@
 use std::io::{Result as IoResult, Write};
 
 use crate::canvas::Canvas;
-use crate::linalg::{Point2, Vec2};
+use crate::linalg::{Point2, Rectangle, Vec2};
 use crate::renderer::Renderer;
 use crate::terminal::block::Block;
 use crate::terminal::cell::Cell;
@@ -9,7 +9,7 @@ use crate::terminal::cell::Cell;
 #[derive(Debug)]
 pub struct Terminal
 {
-    size: Vec2,
+    working_area: Rectangle,
     blocks: Vec<Block>,
     cursor_ratio: usize,
 }
@@ -18,9 +18,11 @@ impl Terminal
 {
     pub fn new(size: Vec2, cursor_ratio: usize) -> Self
     {
+        let working_area = Rectangle::from_size(Point2::ZERO, size);
         let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); size.x * size.y];
+
         Self {
-            size,
+            working_area,
             blocks,
             cursor_ratio,
         }
@@ -34,7 +36,7 @@ impl Terminal
 
     pub fn canvas(&mut self) -> Canvas<'_>
     {
-        Canvas::new(self, self.size)
+        Canvas::new(self, self.working_area)
     }
 
     pub fn get_blocks_mut(&mut self) -> &mut Vec<Block>
@@ -55,14 +57,14 @@ impl Terminal
 
     fn block_position_to_buffer_index(&self, position: Point2) -> usize
     {
-        position.x + position.y * self.size.x
+        position.x + position.y * self.working_area.width()
     }
 
     fn block_index_to_screen_position(&self, index: usize) -> Point2
     {
         Point2::new(
-            (index * self.cursor_ratio) % (self.size.x * self.cursor_ratio),
-            index / self.size.x,
+            (index * self.cursor_ratio) % (self.working_area.width() * self.cursor_ratio),
+            index / self.working_area.width(),
         )
     }
 }
