@@ -17,6 +17,14 @@ impl Point2
     {
         Self { x, y }
     }
+
+    pub const fn from_signed(x: isize, y: isize) -> Self
+    {
+        Self {
+            x: x as usize,
+            y: y as usize,
+        }
+    }
 }
 
 impl Add<Vec2> for Point2
@@ -25,7 +33,10 @@ impl Add<Vec2> for Point2
 
     fn add(self, rhs: Vec2) -> Self::Output
     {
-        Point2::new(self.x + rhs.x, self.y + rhs.y)
+        let new_x = self.x.saturating_add_signed(rhs.x);
+        let new_y = self.y.saturating_add_signed(rhs.y);
+
+        Point2::new(new_x, new_y)
     }
 }
 
@@ -33,7 +44,7 @@ impl AddAssign<Vec2> for Point2
 {
     fn add_assign(&mut self, rhs: Vec2)
     {
-        self.x += rhs.x;
-        self.y += rhs.y;
+        self.x = self.x.saturating_add_signed(rhs.x);
+        self.y = self.y.saturating_add_signed(rhs.y);
     }
 }

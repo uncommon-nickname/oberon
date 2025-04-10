@@ -35,11 +35,6 @@ impl Rgb
         )
     }
 
-    pub fn complementary(&self) -> Self
-    {
-        self.to_hsl().complementary().to_rgb()
-    }
-
     pub fn darken(&self, ratio: f32) -> Self
     {
         self.to_hsl().darken(ratio).to_rgb()

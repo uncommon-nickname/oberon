@@ -10,6 +10,12 @@ pub enum Color
 
 impl Color
 {
+    pub const BLACK: Self = Color::Rgb(Rgb::BLACK);
+    pub const WHITE: Self = Color::Rgb(Rgb::WHITE);
+    pub const RED: Self = Color::Rgb(Rgb::RED);
+    pub const GREEN: Self = Color::Rgb(Rgb::GREEN);
+    pub const BLUE: Self = Color::Rgb(Rgb::BLUE);
+
     pub const fn hsl(h: f32, s: f32, l: f32) -> Self
     {
         let hsl = Hsl::new(h, s, l);
@@ -26,16 +32,6 @@ impl Color
     {
         let rgb = Rgb::new(r, g, b);
         Color::Rgb(rgb)
-    }
-
-    pub fn complementary(self) -> Self
-    {
-        match self
-        {
-            Self::Rgb(rgb) => Color::Rgb(rgb.complementary()),
-            Self::Hsl(hsl) => Color::Hsl(hsl.complementary()),
-            Self::Default => self,
-        }
     }
 
     pub fn darken(self, ratio: f32) -> Self

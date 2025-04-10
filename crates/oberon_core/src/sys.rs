@@ -15,7 +15,7 @@ pub fn current_window_size() -> IoResult<Vec2>
     };
     match unsafe { ioctl(STDOUT_FILENO, TIOCGWINSZ, &mut size) }
     {
-        0 => Ok(Vec2::new(size.ws_col as usize, size.ws_row as usize)),
+        0 => Ok(Vec2::new(size.ws_col as isize, size.ws_row as isize)),
         _ => Err(Error::last_os_error()),
     }
 }

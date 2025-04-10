@@ -18,7 +18,7 @@ impl Terminal
 {
     pub fn new(size: Vec2, cursor_ratio: usize) -> Self
     {
-        let working_area = Rectangle::from_size(Point2::ZERO, size);
+        let working_area = Rectangle::from_corner_and_size(Point2::ZERO, size);
         let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); working_area.area()];
 
         Self {

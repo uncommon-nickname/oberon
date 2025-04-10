@@ -23,8 +23,8 @@ impl Animation
     {
         let mut rng = rng();
 
-        let start_color = Rgb::BLACK;
-        let end_color = Rgb::WHITE;
+        let start_color = Rgb::GREEN;
+        let end_color = Rgb::BLUE;
         let end_time = rng.random_range(2.0..10.0);
         let elapsed = 0.0;
 
@@ -75,7 +75,7 @@ impl ApplicationHandler for App
             {
                 self.world
                     .spawn()
-                    .with(Point2::new(x, y))
+                    .with(Point2::from_signed(x, y))
                     .with(Animation::new());
             }
         }

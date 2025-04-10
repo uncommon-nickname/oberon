@@ -24,12 +24,6 @@ impl Hsl
         Self { h, s, l }
     }
 
-    pub fn complementary(&self) -> Self
-    {
-        let new_s = (self.s + 180.0) % 360.0;
-        Self::new(self.h, new_s, self.l)
-    }
-
     pub fn darken(&self, ratio: f32) -> Self
     {
         let new_l = (self.l - ratio).clamp(0.0, 1.0);
