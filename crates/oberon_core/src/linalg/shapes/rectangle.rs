@@ -22,14 +22,8 @@ impl Rectangle
 
     pub fn from_corner_and_size(top_left: Point2, size: Vec2) -> Self
     {
-        // FIXME: This is bugged af and will only work for top_left = 0,0
-        let top_right = top_left + Vec2::new(size.x, 0);
-        let bottom_left = top_left + Vec2::new(0, size.y);
         let bottom_right = top_left + size;
-
-        Self {
-            vertices: [top_left, top_right, bottom_left, bottom_right],
-        }
+        Self::from_corners(top_left, bottom_right)
     }
 
     pub fn width(&self) -> usize
@@ -60,11 +54,10 @@ impl Rectangle
 
     pub fn center(&self) -> Point2f
     {
-        // FIXME: This should work on a rotated rectangle.
         let [tl, _, _, br] = self.vertices;
 
-        let center_x = (tl.x as f32 + br.x as f32) / 2.0;
-        let center_y = (tl.y as f32 + br.y as f32) / 2.0;
+        let center_x = (tl.x + br.x) as f32 / 2.0;
+        let center_y = (tl.y + br.y) as f32 / 2.0;
 
         Point2f::new(center_x, center_y)
     }
@@ -89,6 +82,9 @@ impl Shape for Rectangle
 
     fn rotate(&mut self, angle: f32)
     {
+        // FIXME: consecutive rotations introduce a drift error.
+        // Keeping the cached original positions and rotating them
+        // by a full angle should do the trick.
         let (sin, cos) = angle.to_radians().sin_cos();
         let center = self.center();
 
