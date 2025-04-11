@@ -1,7 +1,8 @@
 use std::io::{Result as IoResult, Write};
 
 use crate::canvas::Canvas;
-use crate::linalg::{Point2, Rectangle, Shape, Vec2};
+use crate::linalg::shapes::{Rectangle, Shape};
+use crate::linalg::{Point2, Vec2};
 use crate::renderer::Renderer;
 use crate::terminal::block::Block;
 use crate::terminal::cell::Cell;

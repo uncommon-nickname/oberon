@@ -1,7 +1,8 @@
 use std::io::Result as IoResult;
 use std::sync::Arc;
 
-use oberon::oberon_core::linalg::{Point2, Rectangle, Shape};
+use oberon::oberon_core::linalg::shapes::{Rectangle, Shape};
+use oberon::oberon_core::linalg::Point2;
 use oberon::oberon_core::style::Color;
 use oberon::oberon_core::terminal::Cell;
 use oberon::prelude::*;
@@ -51,7 +52,7 @@ impl ApplicationHandler for App
         let mut rectangle = Rectangle::from_corners(origin, end);
         rectangle.rotate(angle);
 
-        canvas.draw_shape(rectangle, Cell::EMPTY.with_bg(Color::WHITE));
+        canvas.draw_shape_outline(rectangle, Cell::EMPTY.with_bg(Color::WHITE));
     }
 }
 

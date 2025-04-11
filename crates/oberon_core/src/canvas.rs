@@ -1,4 +1,5 @@
-use crate::linalg::{Point2, Shape, Vec2};
+use crate::linalg::shapes::Shape;
+use crate::linalg::{Point2, Vec2};
 use crate::terminal::{Cell, Terminal};
 
 pub struct Canvas<'a>
@@ -28,12 +29,11 @@ impl<'a> Canvas<'a>
         self.terminal.at(pos).change_cell(cell);
     }
 
-    pub fn draw_shape(&mut self, shape: impl Shape, cell: Cell)
+    pub fn draw_shape_outline<S: Shape>(&mut self, shape: S, cell: Cell)
     {
-        for pos in shape.get_points()
-        {
-            self.draw(pos, cell);
-        }
+        shape
+            .points_outline()
+            .for_each(|point| self.draw(point, cell));
     }
 
     pub fn erase(&mut self)

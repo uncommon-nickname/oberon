@@ -18,11 +18,11 @@ impl Point2
         Self { x, y }
     }
 
-    pub const fn from_signed(x: isize, y: isize) -> Self
+    pub fn from_signed(x: isize, y: isize) -> Self
     {
         Self {
-            x: x as usize,
-            y: y as usize,
+            x: usize::try_from(x).unwrap_or(0),
+            y: usize::try_from(y).unwrap_or(0),
         }
     }
 }

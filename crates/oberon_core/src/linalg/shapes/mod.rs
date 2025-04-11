@@ -1,10 +1,11 @@
-pub mod rectangle;
+mod rectangle;
+pub use rectangle::Rectangle;
 
 use crate::linalg::Point2;
 
 pub trait Shape
 {
     fn area(&self) -> usize;
-    fn get_points(&self) -> Vec<Point2>;
+    fn points_outline(&self) -> impl Iterator<Item = Point2>;
     fn rotate(&mut self, angle: f32);
 }
