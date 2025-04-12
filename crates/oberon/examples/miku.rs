@@ -41,7 +41,7 @@ impl ApplicationHandler for App
         config.fps = 10.0;
     }
 
-    fn frame(&mut self, mut canvas: Canvas<'_>, _: f32, _: &mut Arc<Loop>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, _: f64, _: &mut Arc<Loop>)
     {
         let frame = &self.frames[self.index];
 

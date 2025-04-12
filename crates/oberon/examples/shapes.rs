@@ -2,57 +2,39 @@ use std::io::Result as IoResult;
 use std::sync::Arc;
 
 use oberon::oberon_core::linalg::shapes::{Rectangle, Shape};
-use oberon::oberon_core::linalg::Point2;
+use oberon::oberon_core::linalg::{Point2, Vec2};
 use oberon::oberon_core::style::Color;
 use oberon::oberon_core::terminal::Cell;
 use oberon::prelude::*;
 
 struct App
 {
-    elapsed: f32,
-    end_time: f32,
+    rectangle: Rectangle,
 }
 
 impl App
 {
     fn new() -> Self
     {
+        let origin = Point2::new(10, 10);
+        let size = Vec2::new(10, 20);
+
         Self {
-            elapsed: 0.0,
-            end_time: 5.0,
+            rectangle: Rectangle::from_corner_and_size(origin, size),
         }
-    }
-
-    fn interpolate(&mut self, dt: f32) -> f32
-    {
-        let time_factor = (self.elapsed / self.end_time).clamp(0.0, 1.0);
-
-        if time_factor == 1.0
-        {
-            self.elapsed = 0.0;
-            return self.interpolate(dt);
-        }
-        self.elapsed += dt;
-
-        360.0 * time_factor
     }
 }
 
 impl ApplicationHandler for App
 {
-    fn frame(&mut self, mut canvas: Canvas<'_>, dt: f32, _: &mut Arc<Loop>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, dt: f64, _: &mut Arc<Loop>)
     {
         canvas.erase();
 
-        let angle = self.interpolate(dt);
+        let angle = 360.0 * dt / 5.0;
+        self.rectangle.rotate(angle);
 
-        let origin = Point2::new(10, 10);
-        let end = Point2::new(30, 20);
-
-        let mut rectangle = Rectangle::from_corners(origin, end);
-        rectangle.rotate(angle);
-
-        canvas.draw_shape_outline(rectangle, Cell::EMPTY.with_bg(Color::WHITE));
+        canvas.draw_shape_outline(self.rectangle, Cell::EMPTY.with_bg(Color::WHITE));
     }
 }
 

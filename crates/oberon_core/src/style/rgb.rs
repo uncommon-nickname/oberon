@@ -45,13 +45,13 @@ impl Rgb
         self.to_hsl().lighten(ratio).to_rgb()
     }
 
-    pub fn mix(&self, other: Self, ratio: f32) -> Self
+    pub fn mix(&self, other: Self, ratio: f64) -> Self
     {
         let rest = 1.0 - ratio;
 
-        let r = (rest * self.r as f32 + ratio * other.r as f32) as u8;
-        let g = (rest * self.g as f32 + ratio * other.g as f32) as u8;
-        let b = (rest * self.b as f32 + ratio * other.b as f32) as u8;
+        let r = (rest * self.r as f64 + ratio * other.r as f64) as u8;
+        let g = (rest * self.g as f64 + ratio * other.g as f64) as u8;
+        let b = (rest * self.b as f64 + ratio * other.b as f64) as u8;
 
         Self::new(r, g, b)
     }

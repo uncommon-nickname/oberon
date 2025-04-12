@@ -13,8 +13,8 @@ struct Animation
 {
     start_color: Rgb,
     end_color: Rgb,
-    end_time: f32,
-    elapsed: f32,
+    end_time: f64,
+    elapsed: f64,
 }
 
 impl Animation
@@ -36,7 +36,7 @@ impl Animation
         }
     }
 
-    fn interpolate(&mut self, dt: f32) -> Rgb
+    fn interpolate(&mut self, dt: f64) -> Rgb
     {
         let time_factor = (self.elapsed / self.end_time).clamp(0.0, 1.0);
 
@@ -81,7 +81,7 @@ impl ApplicationHandler for App
         }
     }
 
-    fn frame(&mut self, mut canvas: Canvas<'_>, dt: f32, _: &mut Arc<Loop>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, dt: f64, _: &mut Arc<Loop>)
     {
         self.world.for_each::<Point2>(|id, pos| {
             let mut animation = self.world.get_mut::<Animation>(id).unwrap();

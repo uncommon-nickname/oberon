@@ -19,9 +19,9 @@ impl Timer
         }
     }
 
-    pub fn start_frame(&mut self) -> f32
+    pub fn start_frame(&mut self) -> f64
     {
-        let dt = self.frame_start.elapsed().as_secs_f32();
+        let dt = self.frame_start.elapsed().as_secs_f64();
         self.frame_start = Instant::now();
         dt
     }
