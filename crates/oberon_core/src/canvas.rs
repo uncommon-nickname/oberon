@@ -14,7 +14,7 @@ impl<'a> Canvas<'a>
         Self { terminal }
     }
 
-    pub fn area(&self) -> usize
+    pub fn area(&self) -> f64
     {
         self.terminal.area()
     }

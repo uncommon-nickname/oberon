@@ -20,7 +20,7 @@ impl Terminal
     pub fn new(size: Vec2, cursor_ratio: usize) -> Self
     {
         let working_area = Rectangle::from_corner_and_size(Point2::ZERO, size);
-        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); working_area.area()];
+        let blocks = vec![Block::new(Cell::EMPTY, cursor_ratio); working_area.area() as usize];
 
         Self {
             working_area,
@@ -35,7 +35,7 @@ impl Terminal
         &mut self.blocks[index]
     }
 
-    pub fn area(&self) -> usize
+    pub fn area(&self) -> f64
     {
         self.working_area.area()
     }

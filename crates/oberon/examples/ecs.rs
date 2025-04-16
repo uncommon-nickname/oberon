@@ -63,7 +63,7 @@ impl ApplicationHandler for App
 {
     fn before_start(&mut self, canvas: Canvas<'_>)
     {
-        self.world = World::new(canvas.area())
+        self.world = World::new(canvas.area() as usize)
             .register::<Point2>()
             .register::<Animation>();
 
