@@ -1,13 +1,13 @@
-use crate::linalg::algorithms::{rotate_vertex, Bresenham};
+use crate::linalg::algorithms::Bresenham;
 use crate::linalg::shapes::Shape;
-use crate::linalg::{Point2, Point2f};
+use crate::linalg::{Matrix3, Point2, Point2f};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ConvexPolygon<const N: usize>
 {
     vertices_curr: [Point2; N],
     vertices_orig: [Point2; N],
-    total_rotation: f64,
+    transformations: Matrix3,
 }
 
 impl<const N: usize> ConvexPolygon<N>
@@ -17,7 +17,7 @@ impl<const N: usize> ConvexPolygon<N>
         Self {
             vertices_curr: vertices,
             vertices_orig: vertices,
-            total_rotation: 0.0,
+            transformations: Matrix3::IDENTITY,
         }
     }
 
@@ -89,14 +89,14 @@ impl<const N: usize> Shape for ConvexPolygon<N>
 
     fn rotate(&mut self, angle: f64)
     {
-        self.total_rotation = (self.total_rotation + angle) % 360.0;
-
-        let (sin, cos) = self.total_rotation.to_radians().sin_cos();
+        let (sin, cos) = angle.to_radians().sin_cos();
         let center = self.center();
+
+        self.transformations *= Matrix3::transformation(sin, cos, center.x, center.y);
 
         self.vertices_curr
             .iter_mut()
             .zip(self.vertices_orig.iter())
-            .for_each(|(curr, orig)| *curr = rotate_vertex(*orig, center, sin, cos));
+            .for_each(|(curr, orig)| *curr = orig.transform(&self.transformations));
     }
 }
