@@ -12,7 +12,7 @@ pub struct ConvexPolygon<const N: usize>
 
 impl<const N: usize> ConvexPolygon<N>
 {
-    pub fn new(vertices: [Point2; N]) -> Self
+    pub fn from_vertices(vertices: [Point2; N]) -> Self
     {
         Self {
             vertices_curr: vertices,

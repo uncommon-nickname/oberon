@@ -25,7 +25,7 @@ impl Rectangle
     pub fn from_vertices(vertices: [Point2; 4]) -> Self
     {
         Self {
-            polygon: ConvexPolygon::new(vertices),
+            polygon: ConvexPolygon::from_vertices(vertices),
         }
     }
 

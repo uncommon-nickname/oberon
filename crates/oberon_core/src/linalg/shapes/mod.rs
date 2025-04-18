@@ -6,3 +6,6 @@ pub use rectangle::Rectangle;
 
 mod shape;
 pub use shape::Shape;
+
+mod triangle;
+pub use triangle::Triangle;

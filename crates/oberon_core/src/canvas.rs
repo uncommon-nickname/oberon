@@ -29,7 +29,7 @@ impl<'a> Canvas<'a>
         self.terminal.at(pos).change_cell(cell);
     }
 
-    pub fn draw_shape_outline<S: Shape>(&mut self, shape: S, cell: Cell)
+    pub fn draw_shape_outline<S: Shape>(&mut self, shape: &S, cell: Cell)
     {
         shape
             .points_outline()
