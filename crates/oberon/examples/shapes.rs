@@ -2,7 +2,7 @@ use std::io::Result as IoResult;
 use std::sync::Arc;
 
 use oberon::oberon_core::linalg::shapes::{ConvexPolygon, Rectangle, Shape, Triangle};
-use oberon::oberon_core::linalg::{Point2, Vec2};
+use oberon::oberon_core::linalg::{Point2, Point2f, Vec2};
 use oberon::oberon_core::style::Color;
 use oberon::oberon_core::terminal::Cell;
 use oberon::prelude::*;
@@ -42,9 +42,11 @@ impl ApplicationHandler for App
     {
         canvas.erase();
 
+        let triangle_rot = Point2f::new(60.0, 15.0);
+
         self.polygon.rotate(-(360.0 * dt / 2.0));
         self.rectangle.rotate(360.0 * dt / 10.0);
-        self.triangle.rotate(360.0 * dt / 5.0);
+        self.triangle.rotate_around(triangle_rot, 360.0 * dt / 5.0);
 
         canvas.draw_shape_outline(&self.rectangle, Cell::EMPTY.with_bg(Color::WHITE));
         canvas.draw_shape_outline(&self.polygon, Cell::new('@').with_fg(Color::RED));

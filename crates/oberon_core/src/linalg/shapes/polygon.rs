@@ -89,10 +89,12 @@ impl<const N: usize> Shape for ConvexPolygon<N>
 
     fn rotate(&mut self, angle: f64)
     {
-        let (sin, cos) = angle.to_radians().sin_cos();
-        let center = self.center();
+        self.rotate_around(self.center(), angle);
+    }
 
-        self.transformations *= Matrix3::transformation(sin, cos, center.x, center.y);
+    fn rotate_around(&mut self, point: Point2f, angle: f64)
+    {
+        self.transformations *= Matrix3::rotation_around(point, angle);
 
         self.vertices_curr
             .iter_mut()

@@ -12,3 +12,6 @@ pub use point2f::Point2f;
 
 mod vec2;
 pub use vec2::Vec2;
+
+mod vec2f;
+pub use vec2f::Vec2f;

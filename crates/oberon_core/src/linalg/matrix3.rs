@@ -1,5 +1,7 @@
 use std::ops::{Mul, MulAssign};
 
+use crate::linalg::{Point2f, Vec2f};
+
 #[derive(Clone, Copy, Debug)]
 pub struct Matrix3
 {
@@ -15,19 +17,43 @@ impl Matrix3
         Self { data }
     }
 
-    pub const fn transformation(sin: f64, cos: f64, x: f64, y: f64) -> Self
+    pub fn rotation(angle: f64) -> Self
     {
-        Self::new([
-            cos,
-            -sin,
-            x - x * cos + y * sin,
-            sin,
-            cos,
-            y - x * sin - y * cos,
-            0.0,
-            0.0,
-            1.0,
-        ])
+        let (sin, cos) = angle.to_radians().sin_cos();
+        let mut matrix = Self::IDENTITY;
+
+        matrix.data[0] = cos;
+        matrix.data[1] = -sin;
+        matrix.data[3] = sin;
+        matrix.data[3] = cos;
+
+        matrix
+    }
+
+    pub fn rotation_around(point: Point2f, angle: f64) -> Self
+    {
+        let (sin, cos) = angle.to_radians().sin_cos();
+
+        let mut matrix = Self::IDENTITY;
+
+        matrix.data[0] = cos;
+        matrix.data[1] = -sin;
+        matrix.data[2] = point.x - point.x * cos + point.y * sin;
+        matrix.data[3] = sin;
+        matrix.data[4] = cos;
+        matrix.data[5] = point.y - point.x * sin - point.y * cos;
+
+        matrix
+    }
+
+    pub fn translation(by: Vec2f) -> Self
+    {
+        let mut matrix = Self::IDENTITY;
+
+        matrix.data[2] = by.x;
+        matrix.data[5] = by.y;
+
+        matrix
     }
 }
 
@@ -40,7 +66,7 @@ impl Mul<Matrix3> for Matrix3
         let m = &self.data;
         let n = &rhs.data;
 
-        // Ugly, but fast.
+        // NOTE: this is ugly, but it will be fast.
         Self::new([
             m[0] * n[0] + m[1] * n[3] + m[2] * n[6],
             m[0] * n[1] + m[1] * n[4] + m[2] * n[7],

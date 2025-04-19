@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign};
 
-use crate::linalg::{Matrix3, Vec2};
+use crate::linalg::{Matrix3, Point2f, Vec2};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Point2
@@ -24,6 +24,11 @@ impl Point2
             x: usize::try_from(x).unwrap_or(0),
             y: usize::try_from(y).unwrap_or(0),
         }
+    }
+
+    pub const fn to_point2f(&self) -> Point2f
+    {
+        Point2f::new(self.x as f64, self.y as f64)
     }
 
     pub fn transform(&self, transform: &Matrix3) -> Self

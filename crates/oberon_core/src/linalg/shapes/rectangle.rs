@@ -73,4 +73,9 @@ impl Shape for Rectangle
     {
         self.polygon.rotate(angle);
     }
+
+    fn rotate_around(&mut self, point: Point2f, angle: f64)
+    {
+        self.polygon.rotate_around(point, angle);
+    }
 }
