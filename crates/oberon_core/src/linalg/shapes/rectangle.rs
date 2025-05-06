@@ -1,4 +1,4 @@
-use crate::linalg::shapes::{ConvexPolygon, Shape};
+use crate::linalg::shapes::{ConvexPolygon, LazyShape, LazyTransformer, Shape};
 use crate::linalg::{Point2, Point2f, Vec2};
 
 #[derive(Clone, Copy, Debug)]
@@ -47,7 +47,7 @@ impl Rectangle
     }
 }
 
-impl Shape for Rectangle
+impl Shape<Self> for Rectangle
 {
     fn area(&self) -> f64
     {
@@ -69,13 +69,31 @@ impl Shape for Rectangle
         self.polygon.points_outline()
     }
 
-    fn rotate(&mut self, angle: f64)
+    fn transform(&mut self) -> LazyTransformer<'_, Self>
     {
-        self.polygon.rotate(angle);
+        LazyTransformer::new(self)
+    }
+}
+
+impl LazyShape for Rectangle
+{
+    fn get_center(&self) -> Point2f
+    {
+        self.center()
     }
 
-    fn rotate_around(&mut self, point: Point2f, angle: f64)
+    fn get_rotations(&mut self) -> &mut crate::linalg::Matrix3
     {
-        self.polygon.rotate_around(point, angle);
+        self.polygon.get_rotations()
+    }
+
+    fn get_translations(&mut self) -> &mut crate::linalg::Matrix3
+    {
+        self.polygon.get_translations()
+    }
+
+    fn perform_update(&mut self)
+    {
+        self.polygon.perform_update();
     }
 }

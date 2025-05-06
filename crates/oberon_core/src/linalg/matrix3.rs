@@ -25,7 +25,7 @@ impl Matrix3
         matrix.data[0] = cos;
         matrix.data[1] = -sin;
         matrix.data[3] = sin;
-        matrix.data[3] = cos;
+        matrix.data[4] = cos;
 
         matrix
     }

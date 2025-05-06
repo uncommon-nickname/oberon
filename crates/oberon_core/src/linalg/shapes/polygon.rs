@@ -1,5 +1,5 @@
 use crate::linalg::algorithms::Bresenham;
-use crate::linalg::shapes::Shape;
+use crate::linalg::shapes::{LazyShape, LazyTransformer, Shape};
 use crate::linalg::{Matrix3, Point2, Point2f};
 
 #[derive(Clone, Copy, Debug)]
@@ -7,7 +7,8 @@ pub struct ConvexPolygon<const N: usize>
 {
     vertices_curr: [Point2; N],
     vertices_orig: [Point2; N],
-    transformations: Matrix3,
+    rotations: Matrix3,
+    translations: Matrix3,
 }
 
 impl<const N: usize> ConvexPolygon<N>
@@ -17,7 +18,8 @@ impl<const N: usize> ConvexPolygon<N>
         Self {
             vertices_curr: vertices,
             vertices_orig: vertices,
-            transformations: Matrix3::IDENTITY,
+            rotations: Matrix3::IDENTITY,
+            translations: Matrix3::IDENTITY,
         }
     }
 
@@ -32,7 +34,7 @@ impl<const N: usize> ConvexPolygon<N>
     }
 }
 
-impl<const N: usize> Shape for ConvexPolygon<N>
+impl<const N: usize> Shape<Self> for ConvexPolygon<N>
 {
     // Source: https://en.wikipedia.org/wiki/Shoelace_formula
     fn area(&self) -> f64
@@ -87,18 +89,36 @@ impl<const N: usize> Shape for ConvexPolygon<N>
         points.into_iter()
     }
 
-    fn rotate(&mut self, angle: f64)
+    fn transform(&mut self) -> super::LazyTransformer<'_, Self>
     {
-        self.rotate_around(self.center(), angle);
+        LazyTransformer::new(self)
+    }
+}
+
+impl<const N: usize> LazyShape for ConvexPolygon<N>
+{
+    fn get_center(&self) -> Point2f
+    {
+        self.center()
     }
 
-    fn rotate_around(&mut self, point: Point2f, angle: f64)
+    fn get_rotations(&mut self) -> &mut Matrix3
     {
-        self.transformations *= Matrix3::rotation_around(point, angle);
+        &mut self.rotations
+    }
+
+    fn get_translations(&mut self) -> &mut Matrix3
+    {
+        &mut self.translations
+    }
+
+    fn perform_update(&mut self)
+    {
+        let final_transform = self.translations * self.rotations;
 
         self.vertices_curr
             .iter_mut()
             .zip(self.vertices_orig.iter())
-            .for_each(|(curr, orig)| *curr = orig.transform(&self.transformations));
+            .for_each(|(curr, orig)| *curr = orig.transform(&final_transform));
     }
 }
