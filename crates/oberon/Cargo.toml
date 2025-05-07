@@ -7,3 +7,4 @@ edition = "2021"
 ctrlc = "3.4.5"
 image = "0.25.6"
 oberon_core = { path = "../oberon_core" }
+oberon_ecs = { path = "../oberon_ecs" }

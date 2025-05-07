@@ -1,7 +1,7 @@
 use std::any::type_name;
 use std::cell::RefCell;
 
-use crate::ecs::world::World;
+use crate::world::World;
 
 #[derive(Debug)]
 pub struct Entity<T>

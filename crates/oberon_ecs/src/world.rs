@@ -2,8 +2,8 @@ use std::any::TypeId;
 use std::cell::{Ref, RefMut};
 use std::collections::HashMap;
 
-use crate::ecs::entity::EntityBuilder;
-use crate::ecs::sparse_set::{ComponentStorage, SparseSet};
+use crate::entity::EntityBuilder;
+use crate::sparse_set::{ComponentStorage, SparseSet};
 
 pub struct World
 {

@@ -1,13 +1,11 @@
 use std::io::Result as IoResult;
-use std::sync::Arc;
 
-use oberon::oberon_core::ecs::World;
-use oberon::oberon_core::linalg::Point2;
-use oberon::oberon_core::rand::rng;
-use oberon::oberon_core::style::{Color, Rgb};
-use oberon::oberon_core::terminal::Cell;
+use oberon::core::linalg::Point2;
+use oberon::core::rand::{rng, Rng};
+use oberon::core::style::{Color, Rgb};
+use oberon::core::terminal::Cell;
+use oberon::ecs::World;
 use oberon::prelude::*;
-use oberon_core::rand::Rng;
 
 struct Animation
 {

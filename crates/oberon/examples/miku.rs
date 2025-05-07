@@ -1,13 +1,12 @@
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Result as IoResult};
-use std::sync::Arc;
 
+use oberon::core::linalg::Point2;
+use oberon::core::style::{Color, Grayscale, Rgb};
+use oberon::core::terminal::Cell;
 use oberon::image::codecs::gif::GifDecoder;
 use oberon::image::{AnimationDecoder, Frame};
-use oberon::oberon_core::linalg::Point2;
-use oberon::oberon_core::style::{Color, Grayscale, Rgb};
-use oberon::oberon_core::terminal::Cell;
 use oberon::prelude::*;
 
 struct App

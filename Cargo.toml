@@ -1,3 +1,3 @@
 [workspace]
-members = ["crates/oberon", "crates/oberon_core"]
+members = ["crates/oberon", "crates/oberon_core", "crates/oberon_ecs"]
 resolver = "2"

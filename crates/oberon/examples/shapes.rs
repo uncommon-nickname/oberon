@@ -1,10 +1,9 @@
 use std::io::Result as IoResult;
-use std::sync::Arc;
 
-use oberon::oberon_core::linalg::shapes::{ConvexPolygon, Rectangle, Shape, Triangle};
-use oberon::oberon_core::linalg::{Point2, Point2f, Vec2, Vec2f};
-use oberon::oberon_core::style::Color;
-use oberon::oberon_core::terminal::Cell;
+use oberon::core::linalg::shapes::{ConvexPolygon, Rectangle, Shape, Triangle};
+use oberon::core::linalg::{Point2, Point2f, Vec2, Vec2f};
+use oberon::core::style::Color;
+use oberon::core::terminal::Cell;
 use oberon::prelude::*;
 
 struct App

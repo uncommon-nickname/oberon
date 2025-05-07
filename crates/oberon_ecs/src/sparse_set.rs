@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::ecs::entity::Entity;
+use crate::entity::Entity;
 
 pub trait ComponentStorage
 {
