@@ -47,7 +47,7 @@ impl Rectangle
     }
 }
 
-impl Shape<Self> for Rectangle
+impl Shape for Rectangle
 {
     fn area(&self) -> f64
     {
@@ -82,14 +82,14 @@ impl LazyShape for Rectangle
         self.center()
     }
 
-    fn get_rotations(&mut self) -> &mut crate::linalg::Matrix3
+    fn get_rotations_mut(&mut self) -> &mut crate::linalg::Matrix3
     {
-        self.polygon.get_rotations()
+        self.polygon.get_rotations_mut()
     }
 
-    fn get_translations(&mut self) -> &mut crate::linalg::Matrix3
+    fn get_translations_mut(&mut self) -> &mut crate::linalg::Matrix3
     {
-        self.polygon.get_translations()
+        self.polygon.get_translations_mut()
     }
 
     fn perform_update(&mut self)

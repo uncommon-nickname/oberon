@@ -17,7 +17,7 @@ impl Triangle
     }
 }
 
-impl Shape<Self> for Triangle
+impl Shape for Triangle
 {
     fn area(&self) -> f64
     {
@@ -52,14 +52,14 @@ impl LazyShape for Triangle
         self.center()
     }
 
-    fn get_rotations(&mut self) -> &mut Matrix3
+    fn get_rotations_mut(&mut self) -> &mut Matrix3
     {
-        self.polygon.get_rotations()
+        self.polygon.get_rotations_mut()
     }
 
-    fn get_translations(&mut self) -> &mut Matrix3
+    fn get_translations_mut(&mut self) -> &mut Matrix3
     {
-        self.polygon.get_translations()
+        self.polygon.get_translations_mut()
     }
 
     fn perform_update(&mut self)

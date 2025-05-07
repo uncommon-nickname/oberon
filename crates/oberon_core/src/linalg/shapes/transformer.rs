@@ -21,15 +21,13 @@ impl<'a, S: LazyShape> LazyTransformer<'a, S>
 
     pub fn rotate_around(self, around: Point2f, by: f64) -> Self
     {
-        let rotations = self.shape.get_rotations();
-        *rotations *= Matrix3::rotation_around(around, by);
+        *self.shape.get_rotations_mut() *= Matrix3::rotation_around(around, by);
         self
     }
 
     pub fn translate(self, by: Vec2f) -> Self
     {
-        let translations = self.shape.get_translations();
-        *translations *= Matrix3::translation(by);
+        *self.shape.get_translations_mut() *= Matrix3::translation(by);
         self
     }
 

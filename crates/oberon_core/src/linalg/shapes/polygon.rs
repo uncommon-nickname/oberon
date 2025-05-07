@@ -23,18 +23,13 @@ impl<const N: usize> ConvexPolygon<N>
         }
     }
 
-    pub fn get_original_vertices(&self) -> &[Point2; N]
+    pub(crate) fn get_original_vertices(&self) -> &[Point2; N]
     {
         &self.vertices_orig
     }
-
-    pub fn get_current_vertices(&self) -> &[Point2; N]
-    {
-        &self.vertices_curr
-    }
 }
 
-impl<const N: usize> Shape<Self> for ConvexPolygon<N>
+impl<const N: usize> Shape for ConvexPolygon<N>
 {
     // Source: https://en.wikipedia.org/wiki/Shoelace_formula
     fn area(&self) -> f64
@@ -77,19 +72,15 @@ impl<const N: usize> Shape<Self> for ConvexPolygon<N>
 
     fn points_outline(&self) -> impl Iterator<Item = Point2>
     {
-        let mut points = Vec::new();
-
-        for index in 0..N
-        {
-            let p0 = self.vertices_curr[index];
-            let p1 = self.vertices_curr[(index + 1) % N];
-
-            points.extend(Bresenham::new(p0, p1));
-        }
-        points.into_iter()
+        (0..N).flat_map(|index| {
+            Bresenham::new(
+                self.vertices_curr[index],
+                self.vertices_curr[(index + 1) % N],
+            )
+        })
     }
 
-    fn transform(&mut self) -> super::LazyTransformer<'_, Self>
+    fn transform(&mut self) -> LazyTransformer<'_, Self>
     {
         LazyTransformer::new(self)
     }
@@ -102,12 +93,12 @@ impl<const N: usize> LazyShape for ConvexPolygon<N>
         self.center()
     }
 
-    fn get_rotations(&mut self) -> &mut Matrix3
+    fn get_rotations_mut(&mut self) -> &mut Matrix3
     {
         &mut self.rotations
     }
 
-    fn get_translations(&mut self) -> &mut Matrix3
+    fn get_translations_mut(&mut self) -> &mut Matrix3
     {
         &mut self.translations
     }

@@ -1,4 +1,4 @@
-use crate::linalg::shapes::{LazyShape, Shape};
+use crate::linalg::shapes::Shape;
 use crate::linalg::{Point2, Vec2};
 use crate::terminal::{Cell, Terminal};
 
@@ -29,7 +29,7 @@ impl<'a> Canvas<'a>
         self.terminal.at(pos).change_cell(cell);
     }
 
-    pub fn draw_shape_outline<S: Shape<S> + LazyShape>(&mut self, shape: &S, cell: Cell)
+    pub fn draw_shape_outline<S: Shape>(&mut self, shape: &S, cell: Cell)
     {
         shape
             .points_outline()

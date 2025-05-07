@@ -33,7 +33,7 @@ impl App
                 Point2::new(40, 10),
                 Point2::new(60, 15),
             ]),
-            triangle_rot_point: Point2f::new(60.0, 15.0),
+            triangle_rot_point: Point2f::new(70.0, 20.0),
         }
     }
 }

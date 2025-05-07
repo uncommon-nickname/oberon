@@ -17,19 +17,6 @@ impl Matrix3
         Self { data }
     }
 
-    pub fn rotation(angle: f64) -> Self
-    {
-        let (sin, cos) = angle.to_radians().sin_cos();
-        let mut matrix = Self::IDENTITY;
-
-        matrix.data[0] = cos;
-        matrix.data[1] = -sin;
-        matrix.data[3] = sin;
-        matrix.data[4] = cos;
-
-        matrix
-    }
-
     pub fn rotation_around(point: Point2f, angle: f64) -> Self
     {
         let (sin, cos) = angle.to_radians().sin_cos();
