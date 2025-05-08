@@ -1,4 +1,4 @@
-use crate::linalg::shapes::{ConvexPolygon, LazyShape, LazyTransformer, Shape};
+use crate::linalg::shapes::{BoundingBox, ConvexPolygon, LazyShape, LazyTransformer, Shape};
 use crate::linalg::{Point2, Point2f, Vec2};
 
 #[derive(Clone, Copy, Debug)]
@@ -54,6 +54,11 @@ impl Shape for Rectangle
         (self.width() * self.height()) as f64
     }
 
+    fn bounding_box(&self) -> BoundingBox
+    {
+        self.polygon.bounding_box()
+    }
+
     fn center(&self) -> Point2f
     {
         let [tl, _, _, br] = self.polygon.get_original_vertices();
@@ -62,6 +67,16 @@ impl Shape for Rectangle
         let center_y = (tl.y + br.y) as f64 / 2.0;
 
         Point2f::new(center_x, center_y)
+    }
+
+    fn contains(&self, point: Point2) -> bool
+    {
+        self.polygon.contains(point)
+    }
+
+    fn points_filled(&self) -> Vec<Point2>
+    {
+        self.polygon.points_filled()
     }
 
     fn points_outline(&self) -> impl Iterator<Item = Point2>

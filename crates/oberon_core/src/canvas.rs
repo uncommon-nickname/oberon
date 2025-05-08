@@ -29,6 +29,14 @@ impl<'a> Canvas<'a>
         self.terminal.at(pos).change_cell(cell);
     }
 
+    pub fn draw_shape<S: Shape>(&mut self, shape: &S, cell: Cell)
+    {
+        shape
+            .points_filled()
+            .iter()
+            .for_each(|point| self.draw(*point, cell));
+    }
+
     pub fn draw_shape_outline<S: Shape>(&mut self, shape: &S, cell: Cell)
     {
         shape

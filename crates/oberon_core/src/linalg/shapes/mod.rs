@@ -1,3 +1,6 @@
+mod bounding_box;
+pub use bounding_box::BoundingBox;
+
 mod polygon;
 pub use polygon::ConvexPolygon;
 

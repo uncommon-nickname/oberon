@@ -1,7 +1,7 @@
 use std::io::Result as IoResult;
 
 use oberon::core::linalg::shapes::{ConvexPolygon, Rectangle, Shape, Triangle};
-use oberon::core::linalg::{Point2, Point2f, Vec2, Vec2f};
+use oberon::core::linalg::{Point2, Point2f, Vec2};
 use oberon::core::style::Color;
 use oberon::core::terminal::Cell;
 use oberon::prelude::*;
@@ -12,6 +12,7 @@ struct App
     rectangle: Rectangle,
     triangle: Triangle,
     triangle_rot_point: Point2f,
+    rectangle_trans: Vec2,
 }
 
 impl App
@@ -33,6 +34,7 @@ impl App
                 Point2::new(60, 15),
             ]),
             triangle_rot_point: Point2f::new(70.0, 20.0),
+            rectangle_trans: Vec2::new(1, 0),
         }
     }
 }
@@ -51,7 +53,7 @@ impl ApplicationHandler for App
         self.rectangle
             .transform()
             .rotate(360.0 * dt / 10.0)
-            .translate(Vec2f::new(1.0, 0.0))
+            .translate(self.rectangle_trans.to_vec2f())
             .finalize();
 
         self.triangle
@@ -59,9 +61,9 @@ impl ApplicationHandler for App
             .rotate_around(self.triangle_rot_point, 360.0 * dt / 5.0)
             .finalize();
 
-        canvas.draw_shape_outline(&self.rectangle, Cell::EMPTY.with_bg(Color::WHITE));
-        canvas.draw_shape_outline(&self.polygon, Cell::new('@').with_fg(Color::RED));
-        canvas.draw_shape_outline(&self.triangle, Cell::EMPTY.with_bg(Color::GREEN));
+        canvas.draw_shape(&self.polygon, Cell::new('@').with_fg(Color::RED));
+        canvas.draw_shape(&self.rectangle, Cell::EMPTY.with_bg(Color::WHITE));
+        canvas.draw_shape(&self.triangle, Cell::EMPTY.with_bg(Color::GREEN));
     }
 }
 

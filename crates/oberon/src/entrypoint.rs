@@ -77,6 +77,7 @@ pub fn run_oberon_application(mut app: impl ApplicationHandler) -> IoResult<()>
 
         app.frame(oberon.terminal.canvas(), dt, &mut oberon.app_loop);
         oberon.terminal.render_frame(&mut oberon.renderer)?;
+        app.after_frame(&mut oberon.app_loop);
 
         oberon.timer.end_frame();
     }

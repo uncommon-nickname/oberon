@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign};
 
+use crate::linalg::Vec2f;
+
 #[derive(Copy, Clone, Debug)]
 pub struct Vec2
 {
@@ -26,6 +28,11 @@ impl Vec2
             x: x as isize,
             y: y as isize,
         }
+    }
+
+    pub const fn to_vec2f(&self) -> Vec2f
+    {
+        Vec2f::new(self.x as f64, self.y as f64)
     }
 }
 
