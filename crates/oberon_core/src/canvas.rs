@@ -33,8 +33,7 @@ impl<'a> Canvas<'a>
     {
         shape
             .points_filled()
-            .iter()
-            .for_each(|point| self.draw(*point, cell));
+            .for_each(|point| self.draw(point, cell));
     }
 
     pub fn draw_shape_outline<S: Shape>(&mut self, shape: &S, cell: Cell)

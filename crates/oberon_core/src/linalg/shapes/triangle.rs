@@ -44,7 +44,7 @@ impl Shape for Triangle
         self.polygon.contains(point)
     }
 
-    fn points_filled(&self) -> Vec<Point2>
+    fn points_filled(&self) -> impl Iterator<Item = Point2>
     {
         self.polygon.points_filled()
     }

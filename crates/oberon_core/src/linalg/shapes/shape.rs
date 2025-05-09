@@ -17,7 +17,7 @@ where
     fn bounding_box(&self) -> BoundingBox;
     fn center(&self) -> Point2f;
     fn contains(&self, point: Point2) -> bool;
-    fn points_filled(&self) -> Vec<Point2>;
+    fn points_filled(&self) -> impl Iterator<Item = Point2>;
     fn points_outline(&self) -> impl Iterator<Item = Point2>;
     fn transform(&mut self) -> LazyTransformer<'_, Self>;
 }

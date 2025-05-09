@@ -129,18 +129,9 @@ impl<const N: usize> Shape for ConvexPolygon<N>
         true
     }
 
-    fn points_filled(&self) -> Vec<Point2>
+    fn points_filled(&self) -> impl Iterator<Item = Point2>
     {
-        let mut result = Vec::new();
-
-        for potential in self.bounding_box()
-        {
-            if self.contains(potential)
-            {
-                result.push(potential);
-            }
-        }
-        result
+        self.bounding_box().filter(|point| self.contains(*point))
     }
 
     fn points_outline(&self) -> impl Iterator<Item = Point2>
