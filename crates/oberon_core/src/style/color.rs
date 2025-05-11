@@ -34,23 +34,39 @@ impl Color
         Color::Rgb(rgb)
     }
 
-    pub fn darken(self, ratio: f32) -> Self
+    pub fn darken(&self, ratio: f32) -> Self
     {
-        match self
+        match *self
         {
             Self::Rgb(rgb) => Color::Rgb(rgb.darken(ratio)),
             Self::Hsl(hsl) => Color::Hsl(hsl.darken(ratio)),
-            Self::Default => self,
+            Self::Default => *self,
         }
     }
 
-    pub fn lighten(self, ratio: f32) -> Self
+    pub fn lighten(&self, ratio: f32) -> Self
     {
-        match self
+        match *self
         {
             Self::Rgb(rgb) => Color::Rgb(rgb.lighten(ratio)),
             Self::Hsl(hsl) => Color::Hsl(hsl.lighten(ratio)),
-            Self::Default => self,
+            Self::Default => *self,
+        }
+    }
+
+    pub fn mix(&self, other: Color, ratio: f64) -> Self
+    {
+        let other = match other
+        {
+            Self::Rgb(rgb) => rgb,
+            Self::Hsl(hsl) => hsl.to_rgb(),
+            Self::Default => return *self,
+        };
+        match *self
+        {
+            Self::Rgb(rgb) => Color::Rgb(rgb.mix(other, ratio)),
+            Self::Hsl(hsl) => Color::Hsl(hsl.to_rgb().mix(other, ratio).to_hsl()),
+            Self::Default => *self,
         }
     }
 }

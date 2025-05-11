@@ -2,15 +2,15 @@ use std::io::Result as IoResult;
 
 use oberon::core::linalg::{Point2, Vec2};
 use oberon::core::rand::{rng, Rng};
-use oberon::core::style::{Color, Rgb};
+use oberon::core::style::Color;
 use oberon::core::terminal::Cell;
 use oberon::ecs::World;
 use oberon::prelude::*;
 
 struct Animation
 {
-    start_color: Rgb,
-    end_color: Rgb,
+    start_color: Color,
+    end_color: Color,
     duration_s: f64,
     elapsed: f64,
 }
@@ -22,9 +22,9 @@ impl Animation
         let mut rng = rng();
 
         Self {
-            start_color: Rgb::GREEN,
-            end_color: Rgb::BLUE,
-            duration_s: rng.random_range(2.0..10.0),
+            start_color: Color::random(),
+            end_color: Color::BLUE,
+            duration_s: rng.random_range(1.0..3.0),
             elapsed: 0.0,
         }
     }
@@ -42,7 +42,7 @@ impl Animation
         let mixed = self.start_color.mix(self.end_color, time_factor);
         self.elapsed += dt;
 
-        Color::Rgb(mixed)
+        mixed
     }
 }
 
