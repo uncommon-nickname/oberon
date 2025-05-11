@@ -2,7 +2,6 @@ use std::io::{stdout, BufWriter, Result as IoResult, Stdout};
 use std::sync::Arc;
 
 use oberon_core::renderer::Renderer;
-use oberon_core::sys::current_window_size;
 use oberon_core::terminal::Terminal;
 
 use crate::app_loop::Loop;
@@ -11,23 +10,23 @@ use crate::config::Config;
 use crate::timer::Timer;
 use crate::utils::install_cleanup_handlers;
 
+pub type ThreadSafeLoop = Arc<Loop>;
+type TerminalRenderer = Renderer<BufWriter<Stdout>>;
+
 #[derive(Debug)]
 pub struct Oberon
 {
-    pub(crate) renderer: Renderer<BufWriter<Stdout>>,
-    pub(crate) terminal: Terminal,
-    pub(crate) timer: Timer,
-    pub(crate) app_loop: Arc<Loop>,
+    renderer: TerminalRenderer,
+    terminal: Terminal,
+    timer: Timer,
+    app_loop: ThreadSafeLoop,
 }
 
 impl Oberon
 {
     pub fn new(config: Config) -> IoResult<Self>
     {
-        let mut size = current_window_size()?;
-
-        // We have to divide the amount of columns by the cursor ratio
-        // to make sure that we can fit with the block rendering.
+        let mut size = config.size;
         size.x /= config.cursor_ratio as isize;
 
         let buf = BufWriter::new(stdout());
@@ -50,6 +49,23 @@ impl Oberon
             app_loop,
         })
     }
+
+    pub fn run<A: ApplicationHandler>(&mut self, mut app: A) -> IoResult<()>
+    {
+        app.before_start(self.terminal.canvas());
+
+        while self.app_loop.is_running()
+        {
+            let dt = self.timer.start_frame();
+
+            app.frame(self.terminal.canvas(), dt, &mut self.app_loop);
+            self.terminal.render_frame(&mut self.renderer)?;
+            app.after_frame(&mut self.app_loop);
+
+            self.timer.end_frame();
+        }
+        Ok(())
+    }
 }
 
 impl Drop for Oberon
@@ -59,27 +75,4 @@ impl Drop for Oberon
         let _ = self.renderer.clear();
         let _ = self.renderer.show_cursor();
     }
-}
-
-pub fn run_oberon_application(mut app: impl ApplicationHandler) -> IoResult<()>
-{
-    let mut config = Config::default();
-
-    app.setup(&mut config);
-
-    let mut oberon = Oberon::new(config)?;
-
-    app.before_start(oberon.terminal.canvas());
-
-    while oberon.app_loop.is_running()
-    {
-        let dt = oberon.timer.start_frame();
-
-        app.frame(oberon.terminal.canvas(), dt, &mut oberon.app_loop);
-        oberon.terminal.render_frame(&mut oberon.renderer)?;
-        app.after_frame(&mut oberon.app_loop);
-
-        oberon.timer.end_frame();
-    }
-    Ok(())
 }

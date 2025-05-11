@@ -61,14 +61,16 @@ impl ApplicationHandler for App
             .rotate_around(self.triangle_rot_point, 360.0 * dt / 5.0)
             .finalize();
 
-        canvas.draw_shape(&self.polygon, Cell::new('@').with_fg(Color::RED));
-        canvas.draw_shape(&self.rectangle, Cell::EMPTY.with_bg(Color::WHITE));
-        canvas.draw_shape(&self.triangle, Cell::EMPTY.with_bg(Color::GREEN));
+        canvas.draw_shape_outline(&self.polygon, Cell::new('@').fg(Color::RED));
+        canvas.draw_shape(&self.rectangle, Cell::EMPTY.bg(Color::WHITE));
+        canvas.draw_shape(&self.triangle, Cell::EMPTY.bg(Color::GREEN));
     }
 }
 
 fn main() -> IoResult<()>
 {
+    let config = Config::new()?;
     let app = App::new();
-    run_oberon_application(app)
+
+    Oberon::new(config)?.run(app)
 }

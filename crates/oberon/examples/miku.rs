@@ -35,11 +35,6 @@ impl App
 
 impl ApplicationHandler for App
 {
-    fn setup(&mut self, config: &mut Config)
-    {
-        config.fps = 10.0;
-    }
-
     fn frame(&mut self, mut canvas: Canvas<'_>, _: f64, _: &mut Arc<Loop>)
     {
         let frame = &self.frames[self.index];
@@ -56,7 +51,7 @@ impl ApplicationHandler for App
             }
             else
             {
-                Cell::EMPTY.with_bg(Color::rgb(r, g, b))
+                Cell::EMPTY.bg(Color::Rgb(rgb))
             };
 
             let pos = Point2::new(x as usize, y as usize);
@@ -74,7 +69,8 @@ fn main() -> IoResult<()>
         .parse::<bool>()
         .expect("a valid bool is needed");
 
+    let config = Config::new()?.fps(10.0);
     let app = App::new(use_grayscale);
 
-    run_oberon_application(app)
+    Oberon::new(config)?.run(app)
 }

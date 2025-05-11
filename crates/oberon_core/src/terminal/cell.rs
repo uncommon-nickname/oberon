@@ -21,13 +21,13 @@ impl Cell
         }
     }
 
-    pub const fn with_bg(mut self, bg: Color) -> Self
+    pub const fn bg(mut self, bg: Color) -> Self
     {
         self.bg = bg;
         self
     }
 
-    pub const fn with_fg(mut self, fg: Color) -> Self
+    pub const fn fg(mut self, fg: Color) -> Self
     {
         self.fg = fg;
         self

@@ -1,6 +1,6 @@
 use std::io::Result as IoResult;
 
-use oberon::core::linalg::Point2;
+use oberon::core::linalg::{Point2, Vec2};
 use oberon::core::rand::{rng, Rng};
 use oberon::core::style::{Color, Rgb};
 use oberon::core::terminal::Cell;
@@ -57,14 +57,23 @@ struct App
     world: World,
 }
 
+impl App
+{
+    fn new(size: Vec2) -> Self
+    {
+        let area = (size.x * size.y) as usize;
+        let world = World::new(area)
+            .register::<Point2>()
+            .register::<Animation>();
+
+        Self { world }
+    }
+}
+
 impl ApplicationHandler for App
 {
     fn before_start(&mut self, canvas: Canvas<'_>)
     {
-        self.world = World::new(canvas.area() as usize)
-            .register::<Point2>()
-            .register::<Animation>();
-
         let size = canvas.size();
 
         for x in 0..size.x
@@ -79,13 +88,13 @@ impl ApplicationHandler for App
         }
     }
 
-    fn frame(&mut self, mut canvas: Canvas<'_>, dt: f64, _: &mut Arc<Loop>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, dt: f64, _: &mut ThreadSafeLoop)
     {
         self.world.for_each::<Point2>(|id, pos| {
             let mut animation = self.world.get_mut::<Animation>(id).unwrap();
 
             let next_color = animation.interpolate(dt);
-            let cell = Cell::EMPTY.with_bg(Color::Rgb(next_color));
+            let cell = Cell::EMPTY.bg(Color::Rgb(next_color));
 
             canvas.draw(*pos, cell);
         });
@@ -94,9 +103,8 @@ impl ApplicationHandler for App
 
 fn main() -> IoResult<()>
 {
-    let app = App {
-        world: World::new(0),
-    };
+    let config = Config::new()?;
+    let app = App::new(config.size);
 
-    run_oberon_application(app)
+    Oberon::new(config)?.run(app)
 }
