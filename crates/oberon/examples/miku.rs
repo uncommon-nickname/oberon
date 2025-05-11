@@ -35,7 +35,7 @@ impl App
 
 impl ApplicationHandler for App
 {
-    fn frame(&mut self, mut canvas: Canvas<'_>, _: f64, _: &mut Arc<Loop>)
+    fn frame(&mut self, mut canvas: Canvas<'_>, _: f64, _: &mut ThreadSafeLoop)
     {
         let frame = &self.frames[self.index];
 

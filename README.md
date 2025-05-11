@@ -50,7 +50,7 @@ impl ApplicationHandler for Test
 fn main() -> std::io::Result<()>
 {
     let config = Config::new()?.fps(30.0).show_cursor(true);
-    Oberon::new(config).run(Test)
+    Oberon::new(config)?.run(Test)
 }
 ```
 
