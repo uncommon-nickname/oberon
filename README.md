@@ -27,37 +27,30 @@ cargo run --example shapes
 The interface is very simple, but a lot of things are currently in wip state, so everything might change.
 
 ```rust
-use std::sync::Arc;
-
-use oberon::oberon_core::linalg::Point2;
-use oberon::oberon_core::style::Color;
-use oberon::oberon_core::terminal::Cell;
+use oberon::core::linalg::Point2;
+use oberon::core::style::Color;
+use oberon::core::terminal::Cell;
 use oberon::prelude::*;
 
 struct Test;
 
 impl ApplicationHandler for Test
 {
-    fn setup(&mut self, config: &mut Config)
+    fn frame(&mut self, mut canvas: Canvas<'_>, _dt: f64, app_loop: &mut ThreadSafeLoop)
     {
-        config.fps = 30.0;
-        config.hide_cursor = true;
-    }
-
-    fn frame(&mut self, mut canvas: Canvas<'_>, _dt: f64, app_loop: &mut Arc<Loop>)
-    {
-        let cell = Cell::EMPTY.with_bg(Color::WHITE);
+        let cell = Cell::EMPTY.bg(Color::WHITE);
         let position = Point2::new(10, 10);
 
         canvas.draw(position, cell);
+
         app_loop.shutdown();
     }
 }
 
 fn main() -> std::io::Result<()>
 {
-    let app = Test {};
-    run_oberon_application(app)
+    let config = Config::new()?.fps(30.0).show_cursor(true);
+    Oberon::new(config).run(Test)
 }
 ```
 
